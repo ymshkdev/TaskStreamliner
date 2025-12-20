@@ -234,3 +234,7 @@
 .btn-edit { background: #3b4043; color: #fff; padding: 10px 20px; border-radius: 4px; }
 .btn-delete { color: #d32f2f; text-decoration: none; }
 .btn-back { margin-left: auto; color: #666; }
+
+/*aタグの色を外す*/
+.sun .day-number a, .sun.day-number a { color: #d32f2f !important; }
+.sat .day-number a, .sat.day-number a { color: #1976d2 !important; }
