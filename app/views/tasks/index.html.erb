@@ -1,15 +1,31 @@
-<%= month_calendar(events: @tasks, attribute: :deadline) do |date, tasks| %>
-  <div class="day-header" style="display: flex; justify-content: space-between;">
-  <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %>">
-    <%= link_to date.day, new_task_path(deadline: date), style: "text-decoration: none; color: inherit;" %>
-  </span>
+<%# 1. ユーザー名表示 %>
+<div class="user-info" style="margin-bottom: 20px;">
+  <h2 style="font-size: 1.2rem; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+    <%= current_user.name %> さんの手帳
+  </h2>
 </div>
 
-  <div class="day-body">
-    <% tasks.each do |task| %>
-      <div class="task-entry">
-        <%= link_to task.title, task_path(task), style: "font-size: 0.8em; text-decoration: none;" %>
-      </div>
-    <% end %>
-  </div>
-<% end %>
+<%# 2. CSS読み込み %>
+<%= stylesheet_link_tag "tasks_index" %>
+
+<%# 3. カレンダー全体を囲むコンテナ %>
+<div class="calendar-container">
+  <%= month_calendar(events: @tasks, attribute: :deadline) do |date, tasks| %>
+    
+    <div class="day-header" style="display: flex; justify-content: space-between;">
+      <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする %>
+      <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %>">
+        <%= link_to date.day, new_task_path(deadline: date), style: "text-decoration: none; color: inherit;" %>
+      </span>
+    </div>
+
+    <div class="day-body">
+      <% tasks.each do |task| %>
+        <div class="task-entry" style="margin-top: 2px;">
+          <%= link_to task.title, task_path(task), class: "task-link", style: "font-size: 0.8em;" %>
+        </div>
+      <% end %>
+    </div>
+    
+  <% end %>
+</div>
