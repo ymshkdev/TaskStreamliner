@@ -56,7 +56,9 @@ end
 private
 
 def task_params
-  params.require(:task).permit(:title, :description, :deadline, :priority, :status)
+  params.require(:task).permit(:title, :description, :deadline, :priority).tap do |p|
+    p[:priority] = p[:priority].to_i if p[:priority].present?
+  end
 end
 
 end
