@@ -1,0 +1,33 @@
+<div class="user-info">
+  <p><%= current_user.name %> さんの手帳</p>
+</div>
+
+<%= stylesheet_link_tag "tasks_index" %>
+
+<div class="calendar-container">
+  <%# simple_calendar を呼び出し。期限カラムを deadline に指定 %>
+  <%= month_calendar(events: @tasks, attribute: :deadline) do |date, tasks| %>
+    
+    <%# 各日付のボックス。日曜・土曜でクラスを切り替え %>
+    <div class="calendar-day-box <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %>">
+      
+      <div class="day-header">
+        <%# 日付をクリックすると新規作成画面へ。URLパラメータに日付を渡す %>
+        <%= link_to new_task_path(deadline: date) do %>
+          <span class="day-number"><%= date.day %></span>
+        <% end %>
+      </div>
+
+      <div class="day-body">
+        <%# その日のタスクを一覧表示 %>
+        <% tasks.each do |task| %>
+          <div class="task-entry">
+           <%# タイトルをクリックすると詳細画面（show）へ飛ぶように設定 %>
+           <%= link_to task.title, task_path(task), class: "task-link" %>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
+  <% end %>
+</div>

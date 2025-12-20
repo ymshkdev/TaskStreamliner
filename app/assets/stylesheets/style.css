@@ -1,0 +1,60 @@
+/* リセットCSS */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+ul,
+li,
+h1,
+h2,
+p,
+div {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN W3", sans-serif;
+  color: #3b4043;
+}
+
+li {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+a {
+  text-decoration: none;
+  color: #3b4043;
+}
+
+/* ログインフォームの簡易的な装飾例 */
+.field {
+  margin-bottom: 15px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+}
+
+.submit-btn {
+  background-color: #3b4043;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #5a5f63;
+}

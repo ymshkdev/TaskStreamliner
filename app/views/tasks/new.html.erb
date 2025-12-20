@@ -1,0 +1,33 @@
+<div class="task-form-container">
+  <h2>新しい予定を書き込む</h2>
+
+  <%= form_with(model: @task, local: true) do |f| %>
+    
+    <div class="field">
+      <%= f.label :title, "タイトル" %>
+      <%= f.text_field :title, placeholder: "何をしますか？" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :deadline, "期限" %>
+      <%# datetime_field を使うと、日付と時間の両方が入力しやすくなります %>
+      <%= f.datetime_field :deadline %>
+    </div>
+
+    <div class="field">
+      <%= f.label :priority, "優先度" %>
+      <%= f.select :priority, [["低", 0], ["中", 1], ["高", 2]] %>
+    </div>
+
+    <div class="field">
+      <%= f.label :description, "メモ" %>
+      <%= f.text_area :description, rows: 5, placeholder: "詳細な内容など" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "手帳に書き込む", class: "submit-btn" %>
+      <%= link_to "キャンセル", tasks_path, class: "cancel-link" %>
+    </div>
+
+  <% end %>
+</div>

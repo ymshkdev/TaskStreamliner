@@ -1,0 +1,236 @@
+/* カレンダー全体の枠組み */
+.calendar-container {
+  width: 95%;          /* 画面の端に少し余白を作る */
+  max-width: 1200px;   /* 広がりすぎないように最大幅を設定 */
+  margin: 20px auto;   /* 中央寄せ */
+  background-color: #fff;
+}
+
+/* Gemが生成するヘッダー（年月とボタン）の整頓 */
+.simple-calendar {
+  .calendar-heading {
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 15px;
+  }
+
+  /* 「2025 April」などのタイトル */
+  .calendar-title {
+    font-size: 1.8rem;
+  font-weight: bold;
+  }
+
+  /* 前月・次月ボタン */
+  .calendar-heading a {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 15px;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    background: #fdfdfd;
+  }
+
+  /* テーブル全体の線 */
+  width: 100% !important;   /* 強制的に親要素の幅いっぱいに広げる */
+  table-layout: fixed;      /* 7列すべてを均等な幅に固定する最重要プロパティ */
+  border-collapse: collapse;
+  border: 1px solid #d1d1d1;
+
+  thead th {
+    padding: 12px 0;
+  border: 1px solid #d1d1d1;
+  background-color: #f9f9f9;
+  text-align: center;
+  }
+
+  /* 曜日の色分け（日曜1番目、土曜7番目） */
+  thead th:nth-child(1) { color: #d32f2f; }
+  thead th:nth-child(7) { color: #1976d2; }
+
+  td {
+    height: 120px;          /* 高さをしっかり確保 */
+  border: 1px solid #d1d1d1;
+  vertical-align: top;
+  padding: 5px;
+  }
+}
+
+.simple-calendar table {
+  width: 100% !important;   /* これで親のdiv（100%）いっぱいに広がります */
+  min-width: 100% !important;
+  table-layout: fixed;      /* 7列を均等にします */
+  border-collapse: collapse;
+  margin: 0 !important;     /* 余計な余白を消す */
+}
+
+/* ついでに table-striped クラスが邪魔をしないように上書き */
+.table-striped {
+  width: 100% !important;
+  background-color: transparent; /* 背景色などは必要に応じて */
+}
+
+/* 以前の設定も維持 */
+.simple-calendar thead th {
+  padding: 12px 0;
+  border: 1px solid #d1d1d1;
+  text-align: center;
+}
+
+.simple-calendar td {
+  height: 120px;
+  border: 1px solid #d1d1d1;
+  vertical-align: top;
+}
+
+/* セル内のデザイン */
+.calendar-day-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .day-header a {
+    text-decoration: none;
+  }
+
+  .day-number {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .task-entry {
+    font-size: 0.7rem;
+    background: #f0f0f0;
+    margin-top: 2px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.simple-calendar thead th:nth-child(1), .sun .day-number { color: #d32f2f; }
+.simple-calendar thead th:nth-child(7), .sat .day-number { color: #1976d2; }
+
+/* フォーム全体のコンテナ */
+.task-form-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #fff;
+  border: 1px solid #d1d1d1;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+}
+
+.task-form-container h2 {
+  border-left: 5px solid #3b4043;
+  padding-left: 15px;
+  margin-bottom: 30px;
+  font-size: 1.4rem;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.field input[type="text"],
+.field input[type="datetime-local"],
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.submit-btn {
+  background-color: #3b4043;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cancel-link {
+  margin-left: 15px;
+  text-decoration: none;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* カレンダー上のタスクリンク */
+.task-link {
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+
+.task-link:hover {
+  background-color: #e0e0e0;
+}
+
+/* 削除ボタン（赤色で警告感を出す） */
+.delete-link {
+  margin-left: 15px;
+  color: #d32f2f;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.delete-link:hover {
+  text-decoration: underline;
+}
+
+/* tasks_index.css などに追加 */
+.task-detail-container {
+  max-width: 600px;
+  margin: 50px auto;
+}
+
+.task-card {
+  background: #fff;
+  border: 1px solid #d1d1d1;
+  padding: 30px;
+  box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+}
+
+.task-header h2 {
+  margin-top: 10px;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #3b4043;
+  padding-bottom: 10px;
+}
+
+.info-group {
+  margin-top: 20px;
+}
+
+.info-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.task-actions {
+  margin-top: 40px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn-edit { background: #3b4043; color: #fff; padding: 10px 20px; border-radius: 4px; }
+.btn-delete { color: #d32f2f; text-decoration: none; }
+.btn-back { margin-left: auto; color: #666; }

@@ -1,0 +1,30 @@
+<div class="task-detail-container">
+  <div class="task-card">
+    <div class="task-header">
+      <span class="priority-badge priority-<%= @task.priority %>">
+        <%= @task.priority_i18n if @task.priority %> <%# 優先度を日本語で出す場合の設定 %>
+      </span>
+      <h2><%= @task.title %></h2>
+    </div>
+
+    <div class="task-body">
+      <div class="info-group">
+        <label>期限</label>
+        <p><%= @task.deadline.strftime("%Y年%m月%d日 %H:%M") %></p>
+      </div>
+
+      <div class="info-group">
+        <label>メモ</label>
+        <p><%= simple_format(@task.description) %></p>
+      </div>
+    </div>
+
+    <div class="task-actions">
+      <%= link_to "編集する", edit_task_path(@task), class: "btn-edit" %>
+      <%= link_to "削除する", task_path(@task), 
+                  data: { turbo_method: :delete, turbo_confirm: "本当にこの予定を削除しますか？" }, 
+                  class: "btn-delete" %>
+      <%= link_to "カレンダーに戻る", tasks_path, class: "btn-back" %>
+    </div>
+  </div>
+</div>
