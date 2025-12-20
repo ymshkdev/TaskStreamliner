@@ -25,5 +25,7 @@ module TaskStreamliner
     # config.eager_load_paths << Rails.root.join("extras")
     # 週の始まりを日曜日に設定
     config.beginning_of_week = :sunday
+    config.i18n.default_locale = :ja
+    config.time_zone = 'Tokyo'
   end
 end

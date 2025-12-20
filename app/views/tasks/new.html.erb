@@ -16,7 +16,7 @@
 
     <div class="field">
       <%= f.label :priority, "優先度" %>
-      <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
+      <%= f.select :priority, Task.priorities.keys.map { |k| [Task.human_attribute_enum_value(:priority, k), k] } %>
     </div>
 
     <div class="field">
