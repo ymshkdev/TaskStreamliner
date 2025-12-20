@@ -1,7 +1,16 @@
 ja:
+  # enum の翻訳
   enums:
     task:
       priority:
         low: "低"
         middle: "中"
         high: "高"
+  # バリデーションの翻訳
+  activerecord:
+    attributes:
+      task:
+        title: "タイトル"
+        description: "メモ"
+        deadline: "期限"
+        priority: "優先度"
