@@ -5,7 +5,8 @@ class Task < ApplicationRecord
   # メモ（description）は必須ではないので、記載しない
   # 優先度やステータスも必須にしたい場合は追加する
   validates :priority, presence: true
-  validates :status, presence: true
+  # statusを実装するまでは、以下のバリデーションはコメントアウト
+  #validates :status, presence: true
   # priorityカラムの 0, 1, 2 を定義
   enum priority: { low: 0, middle: 1, high: 2 }, _prefix: true
   #statusの実装で使用
