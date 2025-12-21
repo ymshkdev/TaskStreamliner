@@ -58,14 +58,14 @@
 }
 
 .simple-calendar table {
-  width: 100% !important;   /* これで親のdiv（100%）いっぱいに広がります */
+  width: 100% !important;   /* これで親のdiv（100%）いっぱいに */
   min-width: 100% !important;
   table-layout: fixed;      /* 7列を均等にします */
   border-collapse: collapse;
   margin: 0 !important;     /* 余計な余白を消す */
 }
 
-/* ついでに table-striped クラスが邪魔をしないように上書き */
+/* table-striped クラスが邪魔をしないように上書き */
 .table-striped {
   width: 100% !important;
   background-color: transparent; /* 背景色などは必要に応じて */
@@ -295,4 +295,23 @@
 .radio-option label {
   cursor: pointer; /* マウスを置くと指マークになる */
   user-select: none; /* 文字を誤って選択（ハイライト）しないようにする */
+}
+
+/* 日曜日と祝日の数字を赤くする */
+.sun a, 
+.holiday a {
+  color: #d32f2f !important;
+}
+
+/* 土曜日は青くする */
+.sat a {
+  color: #1976d2 !important;
+}
+
+/* 祝日名のスタイル（はみ出さないように） */
+.holiday-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
 }

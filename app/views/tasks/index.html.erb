@@ -13,10 +13,16 @@
   <%= month_calendar(events: @tasks, attribute: :start_time) do |date, tasks| %>
     
     <div class="day-header" style="display: flex; justify-content: space-between;">
-      <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする %>
-      <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %>">
+      <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする HolidayJp.holiday?(date) で祝日判定。祝日なら 'holiday' クラスをつける %>
+      <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %> <%= 'holiday' if HolidayJp.holiday?(date) %>">
         <%= link_to date.day, new_task_path(deadline: date), style: "text-decoration: none; color: inherit;" %>
       </span>
+      <%# オプション：祝日名を表示する %>
+      <% if holiday = HolidayJp.between(date, date).first %>
+       <div class="holiday-name" style="font-size: 0.6rem; color: #d32f2f; margin-top: 2px;">
+        <%= holiday.name %>
+       </div>
+      <% end %>
     </div>
 
     <div class="day-body">
