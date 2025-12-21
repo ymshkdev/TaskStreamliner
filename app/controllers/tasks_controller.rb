@@ -18,12 +18,12 @@ class TasksController < ApplicationController
 
  def create
   @task = current_user.tasks.build(task_params)
-  if @task.save
-    # 保存に成功したら、カレンダー画面（index）へリダイレクト
-    redirect_to tasks_path, notice: "予定を帳面に書き込みました"
-  else
-    # 失敗した場合は入力画面を再表示
-    render :new, status: :unprocessable_entity
+  # 保存前に、タイプに合わせて不要な項目をクリアする
+  if @task.todo?
+    @task.start_at = nil
+    @task.end_at = nil
+  elsif @task.schedule?
+    @task.deadline = nil
   end
 end
 
@@ -56,7 +56,7 @@ end
 private
 
 def task_params
-  params.require(:task).permit(:title, :description, :deadline, :priority).tap do |p|
+  params.require(:task).permit(:title, :description, :deadline, :priority, :status, :task_type, :start_at, :end_at).tap do |p|
     p[:priority] = p[:priority].to_i if p[:priority].present?
   end
 end
