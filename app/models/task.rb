@@ -1,41 +1,38 @@
 class Task < ApplicationRecord
   belongs_to :user
-  # タイトルを必須（空欄禁止）にし、最大50文字の制限
-  validates :title, presence: true, length: { maximum: 50 }
-  # メモ（description）は必須ではないので、記載しない
-  # 優先度やステータスも必須にしたい場合は追加する
-  validates :priority, presence: true
-  # statusを実装するまでは、以下のバリデーションはコメントアウト
-  #validates :status, presence: true
-  # priorityカラムの 0, 1, 2 を定義
-  enum priority: { low: 0, middle: 1, high: 2 }, _prefix: true
-  #statusの実装で使用
-  #enum status: { todo: 0, doing: 1, done: 2 }
 
-  # task_type の定義 (0: タスク, 1: 予定)
-  enum task_type: { todo: 0, schedule: 1 }
-
+  # --- 共通のバリデーション ---
   validates :title, presence: true, length: { maximum: 50 }
   validates :priority, presence: true
   
-  # 予定（schedule）の場合のみ、開始時間と終了時間を必須にするバリデーション
+  # --- status実装時のための下書き（将来使用） ---
+  # validates :status, presence: true
+  # enum status: { todo: 0, doing: 1, done: 2 }
+
+  # --- Enumの定義 ---
+  enum priority: { low: 0, middle: 1, high: 2 }, _prefix: true
+  enum task_type: { todo: 0, schedule: 1 }
+
+  # --- タイプ別のバリデーション ---
+  
+  # 1. タスク(todo)の場合、締切(deadline)を必須にする
+  validates :deadline, presence: true, if: :todo?
+
+  # 2. 予定(schedule)の場合、開始と終了を必須にする
   validates :start_at, presence: true, if: :schedule?
   validates :end_at, presence: true, if: :schedule?
 
-  # 終了時間が開始時間より後であることを確認するカスタムバリデーション
+  # 時間の前後関係チェック
   validate :end_at_after_start_at
 
-  # カレンダー表示に使う日付を動的に切り替えるメソッド
+  # --- カレンダー表示用メソッド ---
   def start_time
-    if todo?
-      deadline    # タスクなら締切日を返す
-    else
-      start_at    # 予定なら開始時間を返す
-    end
+    todo? ? deadline : start_at
   end
 
   private
 
+  # 予定の終了時間が開始時間より前にならないようにチェック
   def end_at_after_start_at
     return if end_at.blank? || start_at.blank?
     if end_at < start_at
