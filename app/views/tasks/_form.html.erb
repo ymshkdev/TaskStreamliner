@@ -68,6 +68,15 @@
       <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
     </div>
 
+    <%# ステータス選択（タスクの時だけ表示したいのでIDを付与） %>
+    <div id="status-field" class="field">
+     <%= f.label :status %>
+     <%= f.select :status, 
+               Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, 
+               {}, 
+               class: "form-control" %>
+    </div>
+
     <div class="actions">
       <%= f.submit "保存する", class: "submit-btn" %>
       <%= link_to 'キャンセル', tasks_path, class: "cancel-link" %>
@@ -80,6 +89,7 @@
   function applyTaskTypeFields() {
     const todoFields = document.getElementById('todo-fields');
     const scheduleFields = document.getElementById('schedule-fields');
+    const statusField = document.getElementById('status-field');
     const checkedElement = document.querySelector('.type-selector:checked');
     
     // 両方の入力欄を取得
@@ -91,20 +101,23 @@
 
     if (todoFields && scheduleFields && checkedElement) {
       if (checkedElement.value === 'todo') {
+        // --- タスクの場合 ---
         todoFields.style.display = 'block';
         scheduleFields.style.display = 'none';
-        // 追加：タスクに切り替えた際、もし締切が空（エラーで消された等）ならURLの日付で復元
-        if (selectedDate && deadlineInput && !deadlineInput.value) {
+        if (statusField) statusField.style.display = 'block'; // ステータスを表示
+        if (selectedDate && deadlineInput && !deadlineInput.value) { // タスクに切り替えた際、もし締切が空（エラーで消された等）ならURLの日付で復元
           deadlineInput.value = `${selectedDate}T00:00`;
         }
       } else {
+        // --- 予定（スケジュール）の場合 ---
         todoFields.style.display = 'none';
         scheduleFields.style.display = 'block';
 
         // ポイント：
         // 1. URLに日付がある（カレンダー経由）
         // 2. まだ入力欄が空（初めて切り替えた）
-        // この時だけ自動セット。入力エラーで戻った時は input に値が入っているので上書きされません。
+        // この時だけ自動セット。入力エラーで戻った時は input に値が入っているので上書きされない。
+        if (statusField) statusField.style.display = 'none'; // ステータスを非表示にする
         if (selectedDate && startAtInput && !startAtInput.value) {
           startAtInput.value = `${selectedDate}T09:00`;
           handleAutoFill(); 

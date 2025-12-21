@@ -455,3 +455,27 @@
   background-color: #f0f0f0;
   border-radius: 4px;
 }
+
+/* 進行中 (doing): 左の線を太く、または右側にも線を付けて強調 */
+.task-entry.status-doing {
+  border-right: 4px solid #ff9800; /* オレンジ色の強調 */
+  background-color: #fffde7;      /* ほんのり黄色い背景 */
+}
+
+/* 完了 (done): 全体を薄くして打ち消し線 */
+.task-entry.status-done {
+  opacity: 0.5;
+  background-color: #f5f5f5 !important;
+}
+
+.task-entry.status-done .task-link {
+  text-decoration: line-through; /* 打ち消し線 */
+  color: #888 !important;
+}
+
+.task-deadline-time {
+  margin-bottom: 1px;
+}
+.task-time {
+  margin-bottom: 1px;
+}

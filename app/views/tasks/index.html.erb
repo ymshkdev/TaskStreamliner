@@ -28,20 +28,56 @@
 
     <div class="day-body">
       <% tasks.each do |task| %>
-       <div class="task-entry">
-        <%# 予定（schedule）かつ開始時間がある場合、時間（HH:mm）を表示 %>
+       <div class="task-entry <%= task.task_type %> <%= "status-#{task.status}" if task.todo? %>">
+        <%# 予定（schedule）かつ開始時間がある場合、開始時間(HH:mm)~終了時間(HH:mm)を表示 %>
         <% if task.schedule? && task.start_at.present? %>
          <span style="font-size: 0.8em; color: #666;">
-          <%= task.start_at.strftime("%H:%M") %>
+          <%= task.start_at.strftime("%H:%M") %> 〜 <%= task.end_at.strftime("%H:%M") %>
          </span>
         <% end %>
-      
-        <%= link_to task.title, task_path(task), class: "task-link" %>
+
+        <%# --- タスク (todo) の場合：〆時間を表示 --- %>
+        <% if task.todo? && task.deadline.present? %>
+         <div class="task-deadline-time" style="font-size: 0.75em; color: #d9534f; font-weight: bold; line-height: 1.2;">
+          〆 <%= task.deadline.strftime("%H:%M") %>
+         </div>
+        <% end %>
+        <%# タイトル部分（優先度アイコン付き） %>
+        <%= link_to task_path(task), class: "task-link" do %>
+         <% if task.todo? && task.priority_high? %>
+          <span title="優先度：高">🚩</span>
+          <% end %>
+         <%= task.title %>
+         <% end %>
        </div>
       <% end %>
     </div>
     
   <% end %>
+  
+</div>
+
+<hr>
+<div class="todo-priority-list">
+  <h3>📌 未完了タスク（優先度順）</h3>
+  <ul>
+    <% @todo_list.each do |todo| %>
+      <li style="margin-bottom: 5px;">
+        <%# 優先度アイコン %>
+        <% if todo.priority_high? %><span style="color: red;">🚩</span><% end %>
+        <% if todo.priority_middle? %><span style="color: orange;">🔶</span><% end %>
+        
+        <%# 締切日とタイトル %>
+        <small><%= todo.deadline.strftime("%m/%d") %>(<%= I18n.t('date.abbr_day_names')[todo.deadline.wday] %>) <%= todo.deadline.strftime("%H:%M") %></small>
+        <strong><%= link_to todo.title, task_path(todo) %></strong>
+        
+        <%# ステータス表示（日本語） %>
+        <span class="badge" style="font-size: 0.8em; background: #eee;">
+          <%= I18n.t "enums.task.status.#{todo.status}" %>
+        </span>
+      </li>
+    <% end %>
+  </ul>
 </div>
 
 <script>
