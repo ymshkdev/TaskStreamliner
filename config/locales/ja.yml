@@ -1,19 +1,25 @@
 ja:
-  # enum の翻訳
+  activerecord:
+    models:
+      task: "タスク"
+    attributes:
+      task:
+        title: "タイトル"
+        description: "メモ"
+        deadline: "締切"
+        priority: "優先度"
+        task_type: "登録内容"
+        start_at: "開始時間"
+        end_at: "終了時間"
   enums:
     task:
       priority:
         low: "低"
         middle: "中"
         high: "高"
-  # バリデーションの翻訳
-  activerecord:
-    attributes:
-      task:
-        title: "タイトル"
-        description: "メモ"
-        deadline: "期限"
-        priority: "優先度"
+      task_type:
+        todo: "タスク"
+        schedule: "予定"
   date:
     month_names: [nil, 1月, 2月, 3月, 4月, 5月, 6月, 7月, 8月, 9月, 10月, 11月, 12月]
     abbr_day_names: [日, 月, 火, 水, 木, 金, 土]
