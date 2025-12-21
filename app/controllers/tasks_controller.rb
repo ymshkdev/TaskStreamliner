@@ -16,11 +16,18 @@ class TasksController < ApplicationController
     # beginning_of_month（月初）から end_of_month（月末）の範囲を指定
     # current_user.tasks と書くことで、タスクが0件でも nil ではなく
     # 「空のデータセット」が返るため、カレンダーが表示されるようにする
-    @tasks = current_user.tasks.where(
-     start_at: @start_date.beginning_of_month..@start_date.end_of_month
-     ).or(
-     current_user.tasks.where(deadline: @start_date.beginning_of_month..@start_date.end_of_month)
-     )
+    # 1. 月の範囲を「時間の端から端まで」定義
+    month_start = @start_date.beginning_of_month.beginning_of_day
+    month_end   = @start_date.end_of_month.end_of_day
+
+    # 2. カレンダー表示用：修正した範囲（month_start..month_end）を使う
+    @tasks = current_user.tasks.where(start_at: month_start..month_end)
+                               .or(current_user.tasks.where(deadline: month_start..month_end))
+     @todo_list = current_user.tasks
+                             .todo               # タイプがタスクのもの
+                             .status_todo        # ステータスが「未着手」
+                             .or(current_user.tasks.status_doing) # または「進行中」
+                             .order(priority: :desc, deadline: :asc)
   end
   
   def new
@@ -41,6 +48,7 @@ class TasksController < ApplicationController
     @task.end_at = nil
   elsif @task.schedule?
     @task.deadline = nil
+    @task.status = :todo # 予定の場合はステータスをデフォルトに戻す
   end
 
   if @task.save
@@ -81,9 +89,7 @@ end
 private
 
 def task_params
-  params.require(:task).permit(:title, :description, :deadline, :priority, :status, :task_type, :start_at, :end_at).tap do |p|
-    p[:priority] = p[:priority].to_i if p[:priority].present?
-  end
+  params.require(:task).permit(:title, :description, :deadline, :priority, :status, :task_type, :start_at, :end_at)
 end
 
 end

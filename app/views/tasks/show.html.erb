@@ -21,6 +21,12 @@
           <label>期限</label>
           <p><%= @task.deadline&.strftime("%Y年%m月%d日 %H:%M") || "未設定" %></p>
         </div>
+        <p>
+        <strong>ステータス:</strong>
+         <span class="status-label status-<%= @task.status %>">
+          <%= I18n.t "enums.task.status.#{@task.status}" %>
+         </span>
+        </p>
       <% else %>
         <%# 予定（期間）の場合 %>
         <div class="info-group">

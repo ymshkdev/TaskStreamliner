@@ -4,14 +4,15 @@ class Task < ApplicationRecord
   # --- 共通のバリデーション ---
   validates :title, presence: true, length: { maximum: 50 }
   validates :priority, presence: true
+  validates :status, presence: true, if: :todo?
   
-  # --- status実装時のための下書き（将来使用） ---
-  # validates :status, presence: true
-  # enum status: { todo: 0, doing: 1, done: 2 }
+  # --- status ---
+  validates :status, presence: true
+  enum :status,{ todo: 0, doing: 1, done: 2 }, default: :todo, prefix: true
 
   # --- Enumの定義 ---
-  enum priority: { low: 0, middle: 1, high: 2 }, _prefix: true
-  enum task_type: { todo: 0, schedule: 1 }
+  enum :priority, { low: 0, middle: 1, high: 2 }, prefix: true
+  enum :task_type, { todo: 0, schedule: 1 }
 
   # --- タイプ別のバリデーション ---
   

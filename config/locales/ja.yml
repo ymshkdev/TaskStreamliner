@@ -8,11 +8,16 @@ ja:
         description: "メモ"
         deadline: "締切"
         priority: "優先度"
+        status: "ステータス"
         task_type: "登録内容"
         start_at: "開始時間"
         end_at: "終了時間"
   enums:
     task:
+      status:
+        todo: "未着手"
+        doing: "進行中"
+        done: "完了"
       priority:
         low: "低"
         middle: "中"
@@ -23,3 +28,4 @@ ja:
   date:
     month_names: [nil, 1月, 2月, 3月, 4月, 5月, 6月, 7月, 8月, 9月, 10月, 11月, 12月]
     abbr_day_names: [日, 月, 火, 水, 木, 金, 土]
+  
