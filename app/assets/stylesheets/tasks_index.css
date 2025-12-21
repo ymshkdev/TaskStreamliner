@@ -315,3 +315,143 @@
   text-overflow: ellipsis;
   font-weight: bold;
 }
+
+.calendar-navigation {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.jump-form select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* simple_calendar のデフォルトタイトル（2025年12月）を非表示にする */
+.simple-calendar .calendar-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* セレクトボックスを「ただの文字」っぽく見せる魔法のCSS */
+.select-jump {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem; /* タイトルと同じ大きさに */
+  font-weight: bold;
+  cursor: pointer;
+  appearance: none; /* デフォルトの下矢印を消す（ブラウザによる） */
+  padding: 0 5px;
+  color: #333;
+}
+
+.select-jump:hover {
+  background-color: #f0f0f0; /* ホバーした時だけ少し色を変えて「押せる」ことを伝える */
+  border-radius: 5px;
+}
+
+/* フォーム全体を中央に寄せる */
+.jump-form {
+  display: flex;
+  align-items: center;
+}
+
+/* 自作ヘッダーを横並びにして中央に寄せる */
+.calendar-heading-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* 前月・次月ボタンを既存のデザインに合わせる */
+.btn-nav {
+  text-decoration: none;
+  color: #333;
+  padding: 5px 15px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background: #fdfdfd;
+}
+
+/* フォーム内の文字サイズ調整 */
+.unit {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* 自作ヘッダーのレイアウト */
+.calendar-heading-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 10px 0;
+}
+
+/* 前月・次月ボタンのデザイン */
+.btn-nav {
+  text-decoration: none;
+  color: #333;
+  padding: 8px 16px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+/* セレクトボックスを大きなタイトル文字に見せる */
+.select-jump {
+  font-size: 1.8rem; /* カレンダータイトルの大きさ */
+  font-weight: bold;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 5px;
+  color: #333;
+  /* デフォルトの矢印を消す（任意。残した方が「選べる」とわかりやすい場合もあります） */
+  appearance: none; 
+}
+
+.select-jump:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.unit {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* 文字をクリックできるようにし、見た目をタイトル文字と一致させる */
+.calendar-title {
+  cursor: default;
+}
+
+.calendar-title .select-jump {
+  font-size: 1.8rem; /* 画像のサイズに合わせる */
+  font-weight: bold;
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 2px;
+  color: #333;
+  appearance: none; /* 下矢印を消して「ただの文字」に見せる */
+  -webkit-appearance: none;
+}
+
+/* ホバー時に「選択可能」であることを示す */
+.calendar-title .select-jump:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}

@@ -1,9 +1,26 @@
 class TasksController < ApplicationController
  before_action :authenticate_user! # ログイン必須にする
   def index
+   # 1. 基準となる日付（@start_date）を決定する
+   if params[:year] && params[:month]
+    # 年月セレクトボックスからジャンプしてきた場合
+    @start_date = Date.new(params[:year].to_i, params[:month].to_i, 1)
+   elsif params[:start_date]
+    # カレンダーの「前月」「次月」ボタンを押した場合
+    @start_date = Date.parse(params[:start_date])
+   else
+    # 何も指定がない場合は今日の日付
+    @start_date = Date.today
+   end
+    # 2. 決定した @start_date を元に、その月のタスクと予定を取得する
+    # beginning_of_month（月初）から end_of_month（月末）の範囲を指定
     # current_user.tasks と書くことで、タスクが0件でも nil ではなく
     # 「空のデータセット」が返るため、カレンダーが表示されるようにする
-    @tasks = current_user.tasks
+    @tasks = current_user.tasks.where(
+     start_at: @start_date.beginning_of_month..@start_date.end_of_month
+     ).or(
+     current_user.tasks.where(deadline: @start_date.beginning_of_month..@start_date.end_of_month)
+     )
   end
   
   def new

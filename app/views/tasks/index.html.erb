@@ -10,7 +10,8 @@
 
 <%# 3. カレンダー全体を囲むコンテナ %>
 <div class="calendar-container">
-  <%= month_calendar(events: @tasks, attribute: :start_time) do |date, tasks| %>
+  
+  <%= month_calendar(events: @tasks, attribute: :start_time, start_date: @start_date) do |date, tasks| %>
     
     <div class="day-header" style="display: flex; justify-content: space-between;">
       <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする HolidayJp.holiday?(date) で祝日判定。祝日なら 'holiday' クラスをつける %>
@@ -42,3 +43,56 @@
     
   <% end %>
 </div>
+
+<script>
+  function setupDirectJump() {
+    const titleElement = document.querySelector('.calendar-title');
+    if (!titleElement || titleElement.querySelector('select')) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const text = titleElement.textContent;
+    const defaultYear = text.match(/\d{4}/)?.[0];
+    const defaultMonth = text.match(/\d{1,2}(?=月)/)?.[0];
+
+    const currentYear = urlParams.get('year') || defaultYear;
+    const currentMonth = urlParams.get('month') || defaultMonth;
+
+    const createSelect = (start, end, selected, name) => {
+      let html = `<select class="select-jump ${name}">`;
+      for (let i = start; i <= end; i++) {
+        html += `<option value="${i}" ${i == selected ? 'selected' : ''}>${i}</option>`;
+      }
+      return html + `</select>`;
+    };
+
+    titleElement.innerHTML = `
+      ${createSelect(2020, 2030, currentYear, 'year')}年
+      ${createSelect(1, 12, currentMonth, 'month')}月
+    `;
+
+    // --- ここから追加：前月・次月ボタンのリンク修正 ---
+    const navLinks = document.querySelectorAll('.calendar-heading a');
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      const dateMatch = href.match(/start_date=(\d{4})-(\d{2})-\d{2}/);
+      if (dateMatch) {
+        // Gemが作ったリンク(start_date=YYYY-MM-DD)から年と月を抽出して書き換える
+        const newYear = dateMatch[1];
+        const newMonth = parseInt(dateMatch[2], 10);
+        link.setAttribute('href', `${window.location.pathname}?year=${newYear}&month=${newMonth}`);
+      }
+    });
+    // --- ここまで ---
+
+    titleElement.querySelectorAll('select').forEach(select => {
+      select.addEventListener('change', () => {
+        const year = titleElement.querySelector('.year').value;
+        const month = titleElement.querySelector('.month').value;
+        window.location.href = `${window.location.pathname}?year=${year}&month=${month}`;
+      });
+    });
+  }
+
+  document.addEventListener('turbo:load', setupDirectJump);
+  document.addEventListener('turbo:render', setupDirectJump);
+</script>
