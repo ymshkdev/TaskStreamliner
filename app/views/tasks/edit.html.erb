@@ -1,31 +1,3 @@
-<div class="task-form-container">
-  <h2>予定を修正する</h2>
+<h2>新規登録</h2>
 
-  <%= form_with(model: @task, local: true) do |f| %>
-    <div class="field">
-      <%= f.label :title, "タイトル" %>
-      <%= f.text_field :title %>
-    </div>
-
-    <div class="field">
-      <%= f.label :deadline, "期限" %>
-      <%= f.datetime_field :deadline %>
-    </div>
-
-    <div class="field">
-      <%= f.label :priority, "優先度" %>
-      <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
-    </div>
-
-    <div class="field">
-      <%= f.label :description, "メモ" %>
-      <%= f.text_area :description, rows: 5 %>
-    </div>
-
-    <div class="actions">
-      <%= f.submit "変更を保存する", class: "submit-btn" %>
-      <%= link_to "削除する", task_path(@task), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, class: "delete-link" %>
-      <%= link_to "キャンセル", tasks_path, class: "cancel-link" %>
-    </div>
-  <% end %>
-</div>
+<%= render 'form', task: @task %>

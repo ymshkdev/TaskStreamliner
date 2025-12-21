@@ -1,28 +1,51 @@
 <div class="task-detail-container">
   <div class="task-card">
     <div class="task-header">
-      <span class="priority-badge priority-<%= @task.priority %>">
-        <%= @task.priority_i18n if @task.priority %> <%# 優先度を日本語で出す場合の設定 %>
-      </span>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <%# タイプのバッジ（タスク or 予定） %>
+        <span class="type-badge type-<%= @task.task_type %>" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: #eee; color: #666;">
+          <%= @task.task_type_i18n %>
+        </span>
+        <%# 優先度バッジ %>
+        <span class="priority-badge priority-<%= @task.priority %>">
+          <%= @task.priority_i18n if @task.priority %>
+        </span>
+      </div>
       <h2><%= @task.title %></h2>
     </div>
 
     <div class="task-body">
-      <div class="info-group">
-        <label>期限</label>
-        <p><%= @task.deadline.strftime("%Y年%m月%d日 %H:%M") %></p>
-      </div>
+      <% if @task.todo? %>
+        <%# タスク（締切）の場合 %>
+        <div class="info-group">
+          <label>期限</label>
+          <p><%= @task.deadline&.strftime("%Y年%m月%d日 %H:%M") || "未設定" %></p>
+        </div>
+      <% else %>
+        <%# 予定（期間）の場合 %>
+        <div class="info-group">
+          <label>日時</label>
+          <p>
+            <%= @task.start_at&.strftime("%Y年%m月%d日 %H:%M") %> 〜 
+            <br>
+            <%= @task.end_at&.strftime("%Y年%m月%d日 %H:%M") %>
+          </p>
+        </div>
+      <% end %>
 
       <div class="info-group">
         <label>メモ</label>
-        <p><%= simple_format(@task.description) %></p>
+        <%# labelは常に出し、pタグの中身だけ条件分岐させます %>
+        <p>
+          <%= simple_format(@task.description) if @task.description.present? %>
+        </p>
       </div>
     </div>
 
     <div class="task-actions">
       <%= link_to "編集する", edit_task_path(@task), class: "btn-edit" %>
       <%= link_to "削除する", task_path(@task), 
-                  data: { turbo_method: :delete, turbo_confirm: "本当にこの予定を削除しますか？" }, 
+                  data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, 
                   class: "btn-delete" %>
       <%= link_to "カレンダーに戻る", tasks_path, class: "btn-back" %>
     </div>

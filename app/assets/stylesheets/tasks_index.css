@@ -238,3 +238,61 @@
 /*aタグの色を外す*/
 .sun .day-number a, .sun.day-number a { color: #d32f2f !important; }
 .sat .day-number a, .sat.day-number a { color: #1976d2 !important; }
+
+.radio-group {
+  display: flex;
+  gap: 15px;      /* 選択肢同士の間隔 */
+  align-items: center;
+  margin-top: 5px;
+}
+
+.radio-group label {
+  font-weight: normal !important;
+  margin-bottom: 0 !important;
+  cursor: pointer;
+}
+
+.type-fields {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* 各選択肢（ボタン＋文字）のまとまり */
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;       /* ボタンと文字の間隔 */
+  cursor: pointer;
+}
+
+/* ラジオボタン本体を少し小さく */
+.type-selector {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+}
+
+.radio-option label {
+  font-weight: normal !important;
+  margin: 0 !important;
+  white-space: nowrap; /* 改行を防ぐ */
+}
+
+/* 優先度の色分け例 */
+.priority-low    { background-color: #e0e0e0; color: #333; }
+.priority-middle { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.priority-high   { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+.priority-badge {
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.radio-option label {
+  cursor: pointer; /* マウスを置くと指マークになる */
+  user-select: none; /* 文字を誤って選択（ハイライト）しないようにする */
+}

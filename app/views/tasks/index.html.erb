@@ -10,7 +10,7 @@
 
 <%# 3. カレンダー全体を囲むコンテナ %>
 <div class="calendar-container">
-  <%= month_calendar(events: @tasks, attribute: :deadline) do |date, tasks| %>
+  <%= month_calendar(events: @tasks, attribute: :start_time) do |date, tasks| %>
     
     <div class="day-header" style="display: flex; justify-content: space-between;">
       <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする %>
@@ -21,9 +21,16 @@
 
     <div class="day-body">
       <% tasks.each do |task| %>
-        <div class="task-entry" style="margin-top: 2px;">
-          <%= link_to task.title, task_path(task), class: "task-link", style: "font-size: 0.8em;" %>
-        </div>
+       <div class="task-entry">
+        <%# 予定（schedule）かつ開始時間がある場合、時間（HH:mm）を表示 %>
+        <% if task.schedule? && task.start_at.present? %>
+         <span style="font-size: 0.8em; color: #666;">
+          <%= task.start_at.strftime("%H:%M") %>
+         </span>
+        <% end %>
+      
+        <%= link_to task.title, task_path(task), class: "task-link" %>
+       </div>
       <% end %>
     </div>
     

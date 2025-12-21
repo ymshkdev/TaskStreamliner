@@ -1,0 +1,126 @@
+<div class="task-form-container">
+  <%= form_with(model: task, local: true) do |f| %>
+    <%# エラー表示（以前のものを継続） %>
+    <% if task.errors.any? %>
+      <div id="error_explanation" style="color: red;">
+        <ul>
+          <% task.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# 1. タイプの選択（タスク or 予定） %>
+    <div class="field">
+      <%= f.label :task_type, "登録内容" %>
+      <div class="radio-group">
+       <div class="radio-option">
+        <%# id: "type_todo" を指定 %>
+        <%= f.radio_button :task_type, :todo, checked: task.todo?, class: "type-selector", id: "type_todo" %>
+        <%# for: "type_todo" を指定することで、このラベルをクリックしても上のボタンが反応するように %>
+        <%= f.label :task_type, "タスク（締切あり）", for: "type_todo" %>
+       </div>
+       <div class="radio-option">
+        <%# id: "type_schedule" を指定 %>
+        <%= f.radio_button :task_type, :schedule, checked: task.schedule?, class: "type-selector", id: "type_schedule" %>
+        <%# for: "type_schedule" を指定 %>
+        <%= f.label :task_type, "予定（開始・終了あり）", for: "type_schedule" %>
+       </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :title %>
+      <%= f.text_field :title %>
+    </div>
+
+    <%# 2. タスク（todo）用の項目 %>
+    <div id="todo-fields" class="type-fields">
+      <div class="field">
+        <%= f.label :deadline %>
+        <%= f.datetime_local_field :deadline %>
+      </div>
+    </div>
+
+    <%# 3. 予定（schedule）用の項目 %>
+    <div id="schedule-fields" class="type-fields" style="display: none;">
+      <div class="field">
+        <%= f.label :start_at %>
+        <%= f.datetime_local_field :start_at %>
+      </div>
+      <div class="field">
+        <%= f.label :end_at %>
+        <%= f.datetime_local_field :end_at %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :description %>
+      <%= f.text_area :description %>
+    </div>
+
+    <div class="field">
+      <%= f.label :priority %>
+      <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "保存する", class: "submit-btn" %>
+      <%= link_to 'キャンセル', tasks_path, class: "cancel-link" %>
+    </div>
+  <% end %>
+</div>
+
+<%# JavaScriptで表示・非表示を切り替え %>
+<script>
+  document.addEventListener('turbo:load', () => {
+    // 1. タイプ切り替えロジック
+    const selectors = document.querySelectorAll('.type-selector');
+    const todoFields = document.getElementById('todo-fields');
+    const scheduleFields = document.getElementById('schedule-fields');
+
+    function toggleFields() {
+      const checkedElement = document.querySelector('.type-selector:checked');
+      if (!checkedElement) return;
+
+      const selected = checkedElement.value;
+      if (selected === 'todo') {
+        todoFields.style.display = 'block';
+        scheduleFields.style.display = 'none';
+      } else {
+        todoFields.style.display = 'none';
+        scheduleFields.style.display = 'block';
+      }
+    }
+
+    selectors.forEach(el => el.addEventListener('change', toggleFields));
+    toggleFields(); // 初期表示用
+
+    // 2. 終了時間の自動入力ロジック
+    const startAtInput = document.querySelector('input[name="task[start_at]"]');
+    const endAtInput = document.querySelector('input[name="task[end_at]"]');
+
+    if (startAtInput && endAtInput) {
+      startAtInput.addEventListener('change', () => {
+        // 開始時間が入力されていて、かつ終了時間がまだ空の場合のみ実行
+        if (startAtInput.value) {
+          const startDate = new Date(startAtInput.value);
+          
+          // 1時間後の時間を計算（Dateオブジェクトが自動で日付繰り越しを処理）
+          startDate.setHours(startDate.getHours() + 1);
+          
+          // 日本の時間帯（JST）を考慮したISO形式への変換
+          // datetime-localが求める YYYY-MM-DDTHH:mm 形式に整形
+          const year = startDate.getFullYear();
+          const month = String(startDate.getMonth() + 1).padStart(2, '0');
+          const day = String(startDate.getDate()).padStart(2, '0');
+          const hours = String(startDate.getHours()).padStart(2, '0');
+          const minutes = String(startDate.getMinutes()).padStart(2, '0');
+          
+          endAtInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+      });
+    }
+  });
+</script>
