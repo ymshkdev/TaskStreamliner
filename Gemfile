@@ -72,3 +72,4 @@ gem 'enum_help'
 group :production do
   gem 'pg'
 end
+gem 'holiday_jp'
