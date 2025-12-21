@@ -25,6 +25,14 @@ class TasksController < ApplicationController
   elsif @task.schedule?
     @task.deadline = nil
   end
+
+  if @task.save
+    # 保存に成功したら一覧画面へ
+    redirect_to tasks_path, notice: "登録しました"
+  else
+    # 失敗したら入力画面を再表示
+    render :new, status: :unprocessable_entity
+  end
 end
 
 def show
