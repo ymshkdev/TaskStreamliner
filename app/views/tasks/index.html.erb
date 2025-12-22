@@ -13,18 +13,26 @@
   
   <%= month_calendar(events: @tasks, attribute: :start_time, start_date: @start_date) do |date, tasks| %>
     
-    <div class="day-header" style="display: flex; justify-content: space-between;">
-      <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする HolidayJp.holiday?(date) で祝日判定。祝日なら 'holiday' クラスをつける %>
-      <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %> <%= 'holiday' if HolidayJp.holiday?(date) %>">
-        <%= link_to date.day, new_task_path(deadline: date), style: "text-decoration: none; color: inherit;" %>
-      </span>
-      <%# オプション：祝日名を表示する %>
+    <div class="day-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+     <%# 左側：日付と祝日名 %>
+     <div>
+       <%# spanにday-numberクラスを追加して、土日の色設定が効くようにする HolidayJp.holiday?(date) で祝日判定。祝日なら 'holiday' クラスをつける %>
+       <span class="day-number <%= 'sun' if date.sunday? %> <%= 'sat' if date.saturday? %> <%= 'holiday' if HolidayJp.holiday?(date) %>">
+        <%# 日付をクリックしたらその日の詳細ページ（後ほど作成）へ飛ばすためのリンク（今は仮にnewへ） %>
+        <%= link_to date.day, day_tasks_path(date: date), style: "text-decoration: none; color: inherit;" %>
+       </span>
+      <%# 祝日名を表示する %>
       <% if holiday = HolidayJp.between(date, date).first %>
        <div class="holiday-name" style="font-size: 0.6rem; color: #d32f2f; margin-top: 2px;">
         <%= holiday.name %>
        </div>
       <% end %>
-    </div>
+     </div>
+     <%# 右側：＋マーク（新規登録ページへ） %>
+     <%= link_to new_task_path(selected_date: date), class: "add-task-btn", title: "新規登録", style: "text-decoration: none; color: #999;" do %>
+      <span class="plus-icon" style="font-size: 1.2rem; line-height: 1;">&plus;</span>
+     <% end %>
+   </div>
 
     <div class="day-body">
       <% tasks.each do |task| %>

@@ -31,12 +31,22 @@ class TasksController < ApplicationController
   end
   
   def new
-  @task = Task.new
-  # カレンダーからの deadline パラメータがあればセット、なければ今日の日付
-  if params[:deadline]
-    @task.deadline = params[:deadline]
-  else
-    @task.deadline = Time.current
+   # current_user.tasks.build にすることで、最初から user_id がセットされた状態で作成
+   @task = current_user.tasks.build
+   # カレンダーの「＋」ボタンから selected_date が送られてきた場合
+   if params[:selected_date].present?
+    # 文字列を日付オブジェクトに変換
+    date = Date.parse(params[:selected_date])
+    # 1. 予定（schedule）用の初期値（その日の 09:00 〜 10:00 など）
+    @task.start_at = date.in_time_zone.change(hour: 9, min: 0)
+    @task.end_at   = date.in_time_zone.change(hour: 10, min: 0)
+    # 2. タスク（todo）用の初期値（その日の 00:00）
+    @task.deadline = date.in_time_zone.beginning_of_day
+   else
+    # 直接「新規登録」ボタンを押した場合は、現在時刻を基準にする
+    @task.deadline = Time.current.end_of_day
+    @task.start_at = Time.current.change(hour: 9, min: 0)
+    @task.end_at   = Time.current.change(hour: 10, min: 0)
   end
  end
 
@@ -85,6 +95,29 @@ end
   # status: :see_other は Rails 7 (Turbo) で推奨されているリダイレクトのステータスです
   redirect_to tasks_path, notice: "予定を削除しました", status: :see_other
  end
+
+ def day
+  # 1. 右側に表示する「特定の1日」のデータ
+  @date = params[:date] ? Date.parse(params[:date]) : Date.today
+  day_range = @date.beginning_of_day..@date.end_of_day
+  @day_tasks = current_user.tasks.where(start_at: day_range)
+                                 .or(current_user.tasks.where(deadline: day_range))
+                                 .order(:start_at, :deadline)
+
+  # 2. 左側の「ミニカレンダー」が「何月」を表示するかを決定
+  # URLにstart_dateがあればそれを優先。なければ表示中の日の月初にする。
+  @start_date = params[:start_date] ? Date.parse(params[:start_date]) : @date.beginning_of_month
+  
+  # ミニカレンダーに表示するドット（予定ありマーク）を取得するための範囲
+  month_start = @start_date.beginning_of_month.beginning_of_day
+  month_end   = @start_date.end_of_month.end_of_day
+  
+  @month_tasks = current_user.tasks.where(start_at: month_start..month_end)
+                                   .or(current_user.tasks.where(deadline: month_start..month_end))
+
+  # 3. 未完了タスク
+  @todo_list = current_user.tasks.todo.where(status: [:todo, :doing]).order(priority: :desc, deadline: :asc)
+end
 
 private
 

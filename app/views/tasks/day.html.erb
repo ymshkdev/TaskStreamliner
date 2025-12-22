@@ -1,0 +1,75 @@
+<div class="google-calendar-layout">
+  <div class="sidebar">
+    <div class="mini-calendar-section">
+      <div class="calendar-nav d-flex justify-content-between align-items-center mb-2">
+        <span style="font-size: 0.9rem; font-weight: bold;"><%= @start_date.strftime("%Y年 %m月") %></span>
+        <div>
+          <%= link_to "<", day_tasks_path(date: @date, start_date: @start_date.prev_month), class: "btn btn-sm text-muted" %>
+          <%= link_to ">", day_tasks_path(date: @date, start_date: @start_date.next_month), class: "btn btn-sm text-muted" %>
+        </div>
+      </div>
+      <%= month_calendar(events: @month_tasks, start_date: @start_date) do |date, tasks| %>
+        <div class="mini-day-cell <%= 'active-day' if date == @date %>">
+          <%= link_to date.day, day_tasks_path(date: date, start_date: @start_date), style: "font-size: 0.8rem;" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="todo-sidebar-section">
+      <h3 class="sidebar-title">未完了タスク</h3>
+      <div class="todo-list-scroll">
+        <% @todo_list.each do |todo| %>
+          <div class="todo-item">
+            <span class="priority"><%= "🚩" if todo.priority_high? %></span>
+            <span class="title"><%= todo.title %></span>
+            <span class="date"><%= todo.deadline&.strftime("%m/%d") %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="timeline-header d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <%= link_to "← カレンダーに戻る", tasks_path(start_date: @start_date), class: "btn btn-outline-secondary btn-sm me-3" %>
+        <div class="date-display">
+          <span class="day-num" style="font-size: 1.5rem; font-weight: bold;"><%= @date.day %></span>
+          <span class="day-name text-muted ms-2"><%= I18n.t('date.abbr_day_names')[@date.wday] %>(<%= @date.strftime("%a") %>)</span>
+        </div>
+        <%= link_to "今日", day_tasks_path(date: Date.today), class: "btn btn-sm btn-light border ms-3" %>
+      </div>
+      <%= link_to '+ 作成', new_task_path(selected_date: @date), class: "btn btn-primary shadow-sm" %>
+    </div>
+
+    <div class="day-timeline">
+      <% (0..23).each do |hour| %>
+        <div class="hour-row">
+          <div class="hour-label"><%= sprintf("%02d:00", hour) %></div>
+          <div class="hour-slot"></div>
+        </div>
+      <% end %>
+
+      <div class="events-container">
+        <% @day_tasks.each do |task| %>
+          <% if task.schedule? %>
+            <% 
+              top = (task.start_at.hour * 60) + (task.start_at.min)
+              height = ((task.end_at - task.start_at) / 60).to_i
+            %>
+            <div class="event-block" style="top: <%= top %>px; height: <%= height %>px;">
+              <div class="event-inner">
+                <strong><%= task.title %></strong>
+                <p><%= task.start_at.strftime("%H:%M") %> - <%= task.end_at.strftime("%H:%M") %></p>
+              </div>
+            </div>
+          <% elsif task.todo? && task.deadline.present? %>
+            <div class="deadline-line" style="top: <%= (task.deadline.hour * 60) + (task.deadline.min) %>px;">
+              <span class="deadline-text">〆 <%= task.title %> (<%= task.deadline.strftime("%H:%M") %>)</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
