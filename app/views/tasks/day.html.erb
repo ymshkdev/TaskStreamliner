@@ -1,7 +1,7 @@
 <div class="google-calendar-layout">
   <div class="sidebar">
     <div class="mini-calendar-section">
-  <%# 1. 独自ヘッダー：ここだけに年月とボタンを表示させる %>
+  <%# 1. 年月と切り替えボタンの独自ヘッダー %>
   <div class="custom-calendar-header">
     <%= link_to "前月", day_tasks_path(date: @date, start_date: @start_date.prev_month), class: "nav-btn" %>
     
@@ -13,11 +13,24 @@
     <%= link_to "次月", day_tasks_path(date: @date, start_date: @start_date.next_month), class: "nav-btn" %>
   </div>
 
-  <%# 2. カレンダー本体：header: false で Gem標準のヘッダーを「物理的に」生成させない %>
+  <%# 2. カレンダー本体：header: false で Gem標準のヘッダーを生成させない %>
   <div class="mini-calendar-body">
     <%= month_calendar(events: @month_tasks, start_date: @start_date, header: false) do |date, tasks| %>
+     <% 
+      # 休日・土日判定ロジック
+      holiday = HolidayJp.between(date, date).first
+      date_class = if holiday || date.sunday?
+                     'text-danger' # 祝日・日曜は赤
+                   elsif date.saturday?
+                     'text-info'   # 土曜は青（Bootstrapのinfoカラー）
+                   else
+                     ''
+                   end
+    %>
       <div class="mini-day-cell <%= 'active-day' if date == @date %>">
-        <%= link_to date.day, day_tasks_path(date: date, start_date: @start_date), style: "font-size: 0.8rem;" %>
+        <%= link_to date.day, day_tasks_path(date: date, start_date: @start_date), 
+                  class: date_class, 
+                  style: "font-size: 0.8rem; text-decoration: none;" %>
       </div>
     <% end %>
   </div>
@@ -41,10 +54,29 @@
     <div class="timeline-header d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
         <%= link_to "← カレンダーに戻る", tasks_path(start_date: @start_date), class: "btn btn-outline-secondary btn-sm me-3" %>
-        <div class="date-display">
-          <span class="day-num" style="font-size: 1.5rem; font-weight: bold;"><%= @date.day %></span>
-          <span class="day-name text-muted ms-2"><%= I18n.t('date.abbr_day_names')[@date.wday] %>(<%= @date.strftime("%a") %>)</span>
-        </div>
+        <% # 土日祝の判定
+         is_holiday = HolidayJp.between(@date, @date).first
+         date_color_class = if is_holiday || @date.sunday?
+                            'text-danger'
+                            elsif @date.saturday?
+                            'text-info'
+                            else
+                            ''
+                            end
+         %>
+      <div class="date-display d-flex align-items-baseline">
+       <%# 1. 数字部分に色を適用 %>
+       <span class="day-num <%= date_color_class %>" style="font-size: 1.5rem; font-weight: bold;">
+        <%= @date.day %>
+       </span>
+      <%# 2. 曜日部分：土日祝なら色を付け、平日なら元の text-muted を使う %>
+      <span class="day-name ms-2 <%= date_color_class.presence || 'text-muted' %>">
+        <%= I18n.t('date.abbr_day_names')[@date.wday] %>(<%= @date.strftime("%a") %>)
+        <% if is_holiday %>
+          <small class="ms-1" style="font-size: 0.8rem;">- <%= is_holiday.name %></small>
+        <% end %>
+      </span>
+    </div>
         <%= link_to "今日", day_tasks_path(date: Date.today), class: "btn btn-sm btn-light border ms-3" %>
       </div>
       <%= link_to '+ 作成', new_task_path(selected_date: @date), class: "btn btn-primary shadow-sm" %>

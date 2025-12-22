@@ -271,3 +271,22 @@ a {
   font-weight: bold;
   cursor: pointer; /* JSを動かすための目印 */
 }
+
+/* 土日祝の基本色 */
+.text-danger {
+  color: #d93025 !important; /* Googleカレンダー風の赤 */
+}
+
+.text-info {
+  color: #1a73e8 !important; /* Googleカレンダー風の青 */
+}
+
+/* ミニカレンダーの日付リンクが青くなってしまうのを防ぐ */
+.mini-day-cell a.text-danger { color: #d93025 !important; }
+.mini-day-cell a.text-info { color: #1a73e8 !important; }
+
+/* 選択中の日の背景色と文字色のコントラスト調整 */
+.active-day {
+  background-color: #e8f0fe;
+  border-radius: 50%;
+}
