@@ -479,3 +479,29 @@
 .task-time {
   margin-bottom: 1px;
 }
+
+/* 日付ヘッダーを横並びにする */
+.calendar-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* ＋ボタンのデザイン */
+.add-task-btn {
+  text-decoration: none;
+  color: #999; /* 最初は控えめなグレー */
+  font-size: 1.2em;
+  line-height: 1;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+/* マウスを乗せた時に少し目立たせる */
+.add-task-btn:hover {
+  background-color: #eee;
+  color: #333;
+  transform: scale(1.2); /* 少し大きくする */
+}

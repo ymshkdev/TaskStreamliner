@@ -58,3 +58,146 @@ a {
 .submit-btn:hover {
   background-color: #5a5f63;
 }
+
+
+/* 全体のレイアウト */
+.google-calendar-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: white;
+}
+
+/* 左側サイドバー (幅固定) */
+.sidebar {
+  width: 280px;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 画面の高さに固定 */
+  padding: 10px;
+  background-color: #fff;
+}
+
+/* ミニカレンダーを小さくする */
+/* 1. カレンダーセクションをコンパクトに */
+.mini-calendar-section {
+  flex-shrink: 0; /* カレンダーが縦に潰されるのを防ぐ */
+  margin-bottom: 20px;
+}
+
+.mini-calendar-section .simple-calendar {
+  border: none;
+}
+
+/* セルの高さを35pxに固定してギュッと縮める */
+.mini-calendar-section .simple-calendar td {
+  height: 35px !important;
+  padding: 0 !important;
+  vertical-align: middle;
+  border: none !important;
+  text-align: center;
+}
+
+.mini-calendar-section .simple-calendar th {
+  padding: 5px 0 !important;
+  font-size: 0.75rem;
+  border: none !important;
+  color: #70757a;
+}
+
+/* 日付の数字を丸く囲む設定などは維持 */
+.mini-day-cell a {
+  text-decoration: none;
+  color: #3c4043;
+  display: block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  margin: 0 auto;
+}
+
+.active-day {
+  background-color: #d2e3fc;
+  border-radius: 50%;
+}
+
+.active-day a {
+  color: #1a73e8 !important;
+  font-weight: bold;
+}
+
+/* 2. 未完了タスクセクションを救出 */
+.todo-sidebar-section {
+  flex-grow: 1;      /* カレンダーの下の余ったスペースをすべて使う */
+  overflow-y: auto;  /* タスクが増えたらこのエリアだけスクロール */
+  border-top: 1px solid #f1f3f4;
+  padding-top: 10px;
+}
+
+.sidebar-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #3c4043;
+}
+
+.todo-item {
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  align-items: center;
+}
+
+/* 右側メイン */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid #dadce0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* タイムライン本体 */
+.day-timeline {
+  flex-grow: 1;
+  overflow-y: scroll;
+  position: relative;
+}
+
+.hour-row {
+  display: flex;
+  height: 60px; /* 1時間を60pxに固定 */
+  border-bottom: 1px solid #e8eaed;
+}
+
+.hour-label {
+  width: 60px;
+  font-size: 11px;
+  color: #70757a;
+  text-align: right;
+  padding-right: 8px;
+  margin-top: -6px;
+}
+
+/* 予定ブロック */
+.events-container { position: absolute; top: 0; left: 60px; right: 20px; bottom: 0; pointer-events: none; }
+.event-block {
+  position: absolute; width: 90%;
+  background: #039be5; color: white;
+  border-radius: 4px; padding: 4px 8px;
+  font-size: 12px; pointer-events: auto;
+}
+.deadline-line {
+  position: absolute; width: 100%;
+  border-top: 2px solid #ea4335;
+  z-index: 5;
+}
+.deadline-text { background: #ea4335; color: white; font-size: 10px; padding: 0 4px; }
