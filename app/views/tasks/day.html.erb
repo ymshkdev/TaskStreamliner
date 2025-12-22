@@ -79,7 +79,7 @@
     </div>
         <%= link_to "今日", day_tasks_path(date: Date.today), class: "btn btn-sm btn-light border ms-3" %>
       </div>
-      <%= link_to '+ 作成', new_task_path(selected_date: @date), class: "btn btn-primary shadow-sm" %>
+      <%= link_to '+ 作成', new_task_path(selected_date: @date, return_to: 'day', start_date: @start_date), class: "btn btn-primary shadow-sm" %>
     </div>
 
     <div class="day-timeline">

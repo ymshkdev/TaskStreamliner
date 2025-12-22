@@ -33,6 +33,10 @@ class TasksController < ApplicationController
   def new
    # current_user.tasks.build にすることで、最初から user_id がセットされた状態で作成
    @task = current_user.tasks.build
+   # --- 追加：戻り先情報の保持 ---
+   @return_to = params[:return_to]
+   @start_date = params[:start_date]
+   # ----------------------------
    # カレンダーの「＋」ボタンから selected_date が送られてきた場合
    if params[:selected_date].present?
     # 文字列を日付オブジェクトに変換
@@ -62,10 +66,19 @@ class TasksController < ApplicationController
   end
 
   if @task.save
-    # 保存に成功したら一覧画面へ
-    redirect_to tasks_path, notice: "登録しました"
+    # --- 戻り先による分岐 ---
+    if params[:return_to] == 'day'
+      # dayページに戻る。表示していた月(start_date)も引き継ぐ
+      redirect_to day_tasks_path(date: (@task.start_at || @task.deadline).to_date, start_date: params[:start_date]), notice: "保存しました"
+    else
+      # 通常のカレンダー画面に戻る
+      redirect_to tasks_path(start_date: (@task.start_at || @task.deadline).to_date), notice: "保存しました"
+    end
+    # ----------------------------
   else
-    # 失敗したら入力画面を再表示
+    # バリデーションエラー時は入力を保持して再描画
+    @return_to = params[:return_to]
+    @start_date = params[:start_date]
     render :new, status: :unprocessable_entity
   end
 end
