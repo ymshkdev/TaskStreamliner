@@ -113,3 +113,62 @@
     </div>
   </div>
 </div>
+
+<script>
+  window.setupDayPageJump = function() {
+    console.log("JS check: function called");
+    
+    // クラス名を HTML と一致させる
+    const titleElement = document.querySelector('.calendar-title-js');
+    if (!titleElement) {
+      console.log("JS check: .calendar-title-js NOT FOUND");
+      return;
+    }
+
+    if (titleElement.querySelector('select')) return;
+
+    // 現在の表示から数値を取得
+    // titleElement.textContent ではなく、中の span から取るとより確実です
+    const yearSpan = titleElement.querySelector('.year');
+    const monthSpan = titleElement.querySelector('.month');
+    
+    const currentYear = yearSpan ? yearSpan.textContent.trim() : new Date().getFullYear();
+    const currentMonth = monthSpan ? monthSpan.textContent.trim() : new Date().getMonth() + 1;
+
+    console.log(`Target Found: ${currentYear}年 ${currentMonth}月`);
+
+    const createSelect = (start, end, selected, name) => {
+      let html = `<select class="select-jump ${name}" style="border:none; background:transparent; font-weight:bold; font-size:1rem; cursor:pointer; color:inherit;">`;
+      for (let i = start; i <= end; i++) {
+        // 数値比較のために parseInt
+        const isSelected = parseInt(i) === parseInt(selected);
+        html += `<option value="${i}" ${isSelected ? 'selected' : ''}>${i}</option>`;
+      }
+      return html + `</select>`;
+    };
+
+    // 中身をプルダウンに書き換え
+    titleElement.innerHTML = `
+      ${createSelect(2020, 2030, currentYear, 'year')}年
+      ${createSelect(1, 12, currentMonth, 'month')}月
+    `;
+
+    // 変更時のリダイレクト処理
+    const urlParams = new URLSearchParams(window.location.search);
+    titleElement.querySelectorAll('select').forEach(select => {
+      select.addEventListener('change', () => {
+        const year = titleElement.querySelector('.year').value;
+        const month = String(titleElement.querySelector('.month').value).padStart(2, '0');
+        const currentDate = urlParams.get('date') || '<%= @date %>';
+        const newStartDate = `${year}-${month}-01`;
+        
+        console.log("Redirecting to:", newStartDate);
+        window.location.href = `${window.location.pathname}?date=${currentDate}&start_date=${newStartDate}`;
+      });
+    });
+  };
+
+  document.addEventListener('turbo:load', window.setupDayPageJump);
+  document.addEventListener('turbo:render', window.setupDayPageJump);
+  window.setupDayPageJump();
+</script>

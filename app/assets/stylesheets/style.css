@@ -290,3 +290,15 @@ a {
   background-color: #e8f0fe;
   border-radius: 50%;
 }
+
+.select-jump {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  padding: 0 2px;
+}
+
+.select-jump::-ms-expand {
+  display: none;
+}
