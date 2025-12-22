@@ -201,3 +201,73 @@ a {
   z-index: 5;
 }
 .deadline-text { background: #ea4335; color: white; font-size: 10px; padding: 0 4px; }
+
+/* --- サイドバー内カレンダーヘッダーの完全修正 --- */
+
+.sidebar .simple-calendar .calendar-heading {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important; /* 中央寄せに変更して間隔を微調整 */
+  align-items: center !important;
+  width: 100% !important;
+  padding: 5px 0 !important;
+  margin: 0 !important;
+  gap: 5px !important; /* 要素同士の隙間を最小限にする */
+}
+
+/* 年月表示のフォントを少し小さくし、左右の余白を完全にゼロにする */
+.sidebar .simple-calendar .calendar-title {
+  font-size: 0.9rem !important; /* 1remから0.9remに下げて幅を確保 */
+  font-weight: bold !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  flex-shrink: 1 !important; /* スペースが足りない時に縮むのを許可 */
+  text-align: center;
+}
+
+/* ボタンの文字を「前月/次月」から「< / >」に縮小するか、余白をさらに削る */
+.sidebar .simple-calendar .calendar-heading a.btn {
+  padding: 2px 4px !important; /* 左右パディングをさらに削減 */
+  font-size: 0.75rem !important;
+  min-width: 35px !important; /* 最小幅をさらに縮小 */
+  flex-shrink: 0 !important;
+  letter-spacing: -1px; /* 文字間隔を詰めて幅を節約 */
+}
+
+/* サイドバー自体のパディングが邪魔をしている可能性があるので微調整 */
+.sidebar {
+  padding: 10px 5px !important; /* 左右の余白を10pxから5pxに減らす */
+}
+
+/* 1. Gemが生成する可能性のあるヘッダーを強制非表示 */
+.mini-calendar-body .calendar-heading,
+.mini-calendar-body .calendar-title,
+.mini-calendar-body .btn {
+  display: none !important;
+}
+
+/* 2. 新しく作ったヘッダーのスタイル（サイドバー幅にフィットさせる） */
+.custom-calendar-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+.custom-calendar-header .nav-btn {
+  text-decoration: none;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  color: #3c4043;
+  background: #fff;
+}
+
+.custom-calendar-header .calendar-title-js {
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer; /* JSを動かすための目印 */
+}

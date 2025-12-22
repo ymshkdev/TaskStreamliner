@@ -1,19 +1,27 @@
 <div class="google-calendar-layout">
   <div class="sidebar">
     <div class="mini-calendar-section">
-      <div class="calendar-nav d-flex justify-content-between align-items-center mb-2">
-        <span style="font-size: 0.9rem; font-weight: bold;"><%= @start_date.strftime("%Y年 %m月") %></span>
-        <div>
-          <%= link_to "<", day_tasks_path(date: @date, start_date: @start_date.prev_month), class: "btn btn-sm text-muted" %>
-          <%= link_to ">", day_tasks_path(date: @date, start_date: @start_date.next_month), class: "btn btn-sm text-muted" %>
-        </div>
+  <%# 1. 独自ヘッダー：ここだけに年月とボタンを表示させる %>
+  <div class="custom-calendar-header">
+    <%= link_to "前月", day_tasks_path(date: @date, start_date: @start_date.prev_month), class: "nav-btn" %>
+    
+    <span class="calendar-title-js">
+      <span class="year"><%= @start_date.year %></span>年 
+      <span class="month"><%= @start_date.month %></span>月
+    </span>
+    
+    <%= link_to "次月", day_tasks_path(date: @date, start_date: @start_date.next_month), class: "nav-btn" %>
+  </div>
+
+  <%# 2. カレンダー本体：header: false で Gem標準のヘッダーを「物理的に」生成させない %>
+  <div class="mini-calendar-body">
+    <%= month_calendar(events: @month_tasks, start_date: @start_date, header: false) do |date, tasks| %>
+      <div class="mini-day-cell <%= 'active-day' if date == @date %>">
+        <%= link_to date.day, day_tasks_path(date: date, start_date: @start_date), style: "font-size: 0.8rem;" %>
       </div>
-      <%= month_calendar(events: @month_tasks, start_date: @start_date) do |date, tasks| %>
-        <div class="mini-day-cell <%= 'active-day' if date == @date %>">
-          <%= link_to date.day, day_tasks_path(date: date, start_date: @start_date), style: "font-size: 0.8rem;" %>
-        </div>
-      <% end %>
-    </div>
+    <% end %>
+  </div>
+</div>
 
     <div class="todo-sidebar-section">
       <h3 class="sidebar-title">未完了タスク</h3>
