@@ -90,6 +90,8 @@ end
  def edit
   # 自分のタスクだけを編集できるように取得
   @task = current_user.tasks.find(params[:id])
+  @return_to = params[:return_to]
+  @start_date = params[:start_date]
  end
 
  def update
