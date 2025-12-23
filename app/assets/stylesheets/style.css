@@ -302,3 +302,29 @@ a {
 .select-jump::-ms-expand {
   display: none;
 }
+
+/* リンクのデフォルトデザインを解除 */
+.event-link {
+  text-decoration: none !important;
+  color: inherit !important;
+  display: block;
+  height: 100%; /* 親の高さに合わせる */
+  width: 100%;
+}
+
+/* 完了したタスクのスタイル */
+.completed-task {
+  opacity: 0.6; /* 全体を薄くする */
+}
+
+.completed-task .event-inner strong,
+.completed-task .deadline-text {
+  text-decoration: line-through; /* 横線を引く */
+  color: #80868b; /* グレーにする */
+}
+
+/* ホバー時に少し浮き上がらせる（クリックできることを伝える） */
+.event-link:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  transition: background 0.2s;
+}

@@ -9,7 +9,10 @@ class Task < ApplicationRecord
   # --- status ---
   validates :status, presence: true
   enum :status,{ todo: 0, doing: 1, done: 2 }, default: :todo, prefix: true
-
+  def done?
+    # 完了済みをdoneと定義
+    status_done?
+  end
   # --- Enumの定義 ---
   enum :priority, { low: 0, middle: 1, high: 2 }, prefix: true
   enum :task_type, { todo: 0, schedule: 1 }
