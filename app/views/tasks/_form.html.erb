@@ -165,26 +165,30 @@
 
     function initSlimSelect(retryCount = 0) {
       const el = document.getElementById('team-select');
-      if (!el) return;
+      if (!el || el.dataset.ssInit) return;
 
-      // 既に初期化済みなら何もしない
-      if (el.dataset.ssInit) return;
+      // window.SlimSelect または import された SlimSelect を探す
+      const SS = window.SlimSelect || (typeof SlimSelect !== 'undefined' ? SlimSelect : null);
 
-      if (typeof SlimSelect !== 'undefined') {
-        new SlimSelect({
-          select: '#team-select',
-          settings: {
-            // ここで「未選択＝プライベート」と表示させる
-            placeholderText: 'プライベート（外部共有なし）',
-            allowDeselect: true, // 選択を解除して空に戻せるようにする
-            closeOnSelect: false
-          }
-        });
-        el.dataset.ssInit = "true";
-        console.log("SlimSelect起動完了");
+      if (SS) {
+        try {
+          new SS({
+            select: el, // 直接要素を渡す
+            settings: {
+              placeholderText: 'プライベート（外部共有なし）',
+              allowDeselect: true,
+              closeOnSelect: false
+            }
+          });
+          el.dataset.ssInit = "true";
+          console.log("SlimSelect起動成功");
+        } catch (e) {
+          console.error("SlimSelect初期化エラー:", e);
+        }
       } else if (retryCount < 20) {
-        // まだ読み込み終わっていなければ0.1秒待って再トライ
-        setTimeout(() => initSlimSelect(retryCount + 1), 100);
+        setTimeout(() => initSlimSelect(retryCount + 1), 200);
+      } else {
+        console.error("SlimSelect 本体が読み込めませんでした（404エラーの影響）");
       }
     }
 
