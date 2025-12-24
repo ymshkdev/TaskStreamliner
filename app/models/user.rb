@@ -8,5 +8,10 @@ class User < ApplicationRecord
   has_many :teams, through: :memberships # 自分が所属しているチーム一覧を取得可能にする
   has_many :tasks,dependent: :destroy # 自分が作成したタスク一覧
 
+  def leader_of?(team)
+    # membershipsテーブルに「そのチームのリーダーである」というレコードがあるか確認
+    memberships.exists?(team: team, role: 'leader')
+  end
+
   validates :name, presence: true
 end

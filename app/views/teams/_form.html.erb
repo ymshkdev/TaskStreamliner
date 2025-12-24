@@ -1,0 +1,21 @@
+<%# フォーム本体 %>
+<%= form_with model: team, local: true do |f| %>
+  <% if team.errors.any? %>
+    <div style="color: red;">
+      <ul>
+        <% team.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "チーム名" %><br>
+    <%= f.text_field :name, required: true %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "チームを保存する" %>
+  </div>
+<% end %>
