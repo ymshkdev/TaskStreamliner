@@ -1,0 +1,11 @@
+<h1>新規チーム作成</h1>
+
+<%= form_with model: @team do |f| %>
+  <div>
+    <%= f.label :name, "チーム名" %><br>
+    <%= f.text_field :name, required: true %>
+  </div>
+  <%= f.submit "チームを作成する" %>
+<% end %>
+
+<%= link_to "戻る", teams_path %>

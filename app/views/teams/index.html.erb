@@ -1,0 +1,13 @@
+<h1>所属チーム一覧</h1>
+
+<% if @teams.any? %>
+  <ul>
+    <% @teams.each do |team| %>
+      <li><%= team.name %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>所属しているチームはありません。</p>
+<% end %>
+
+<%= link_to "新しいチームを作る", new_team_path %>
