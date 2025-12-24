@@ -7,7 +7,9 @@ Rails.application.routes.draw do
    end
   end
 
-  resources :teams
+  resources :teams do
+    resources :memberships, only: [:create, :destroy]
+  end
   resources :tasks
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
