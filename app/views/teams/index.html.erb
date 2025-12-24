@@ -3,13 +3,16 @@
 <% if @teams.any? %>
   <ul>
     <% @teams.each do |team| %>
-      <li><%= team.name %></li>
+      <li><%= link_to team.name, team_path(team) %></li>
     <% end %>
   </ul>
 <% else %>
   <p>所属しているチームはありません。</p>
 <% end %>
 
-<%= link_to "新しいチームを作る", new_team_path %>
-
-戻るボタンを作成する
+<div class="actions" style="margin-top: 20px;">
+  <%= link_to "新しいチームを作る", new_team_path, class: "btn" %>
+  <br><br>
+  <%# タスク一覧（カレンダー）へ戻るボタン %>
+  <%= link_to "カレンダーに戻る", tasks_path, class: "back-link" %>
+</div>

@@ -1,11 +1,6 @@
 <h1>新規チーム作成</h1>
 
-<%= form_with model: @team do |f| %>
-  <div>
-    <%= f.label :name, "チーム名" %><br>
-    <%= f.text_field :name, required: true %>
-  </div>
-  <%= f.submit "チームを作成する" %>
-<% end %>
+<%= render partial: 'form', locals: { team: @team } %>
 
+<br>
 <%= link_to "戻る", teams_path %>
