@@ -1,5 +1,8 @@
 class Task < ApplicationRecord
   belongs_to :user
+  has_many :task_shares, dependent: :destroy
+  has_many :teams, through: :task_shares
+  has_many :comments, dependent: :destroy
 
   # --- 共通のバリデーション ---
   validates :title, presence: true, length: { maximum: 50 }
