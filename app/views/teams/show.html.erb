@@ -1,0 +1,29 @@
+<h1>チーム: <%= @team.name %></h1>
+
+<h3>メンバー一覧</h3>
+<ul>
+  <% @members.each do |user| %>
+    <li>
+      <%= user.name %> (<%= user.email %>)
+      <%# リーダーだけが他のメンバーを削除できる（自分自身は削除できない等の制御は後ほど） %>
+      <% if current_user.leader_of?(@team) && user != current_user %>
+        <%# そのユーザーのmembershipを探して削除ボタンを設置 %>
+        <% m = @team.memberships.find_by(user: user) %>
+        <%= link_to "削除", team_membership_path(@team, m), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<hr>
+
+<h3>新しいメンバーを招待</h3>
+<%= form_with url: team_memberships_path(@team), local: true do |f| %>
+  <div>
+    <%= f.label :email, "招待するユーザーのメールアドレス" %><br>
+    <%= f.email_field :email, placeholder: "example@mail.com", required: true %>
+  </div>
+  <%= f.submit "チームに招待する" %>
+<% end %>
+
+<%= link_to "一覧に戻る", teams_path %>

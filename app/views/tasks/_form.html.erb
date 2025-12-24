@@ -40,26 +40,37 @@
 
     <%# 2. タスク（todo）用の項目 %>
     <div id="todo-fields" class="type-fields">
-      <div class="field">
-       <%= f.label :deadline %>
-       <%= f.datetime_local_field :deadline, 
-        # エラーで消えていても、URLに日付があればそれを表示する
-        value: @task.deadline&.strftime('%Y-%m-%dT%H:%M') || (params[:deadline] ? "#{params[:deadline]}T23:59" : nil),
-        class: "form-control deadline-input" %>
-      </div>
+     <div class="field">
+      <%= f.label :deadline %>
+      <%
+       deadline_val = task.deadline&.strftime('%Y-%m-%dT%H:%M') || 
+                     (params[:task] && params[:task][:deadline]) || 
+                     (params[:deadline] ? "#{params[:deadline]}T23:59" : nil)%>
+      <%= f.datetime_local_field :deadline, value: deadline_val, class: "form-control deadline-input" %>
+     </div>
     </div>
 
     <%# 3. 予定（schedule）用の項目 %>
     <div id="schedule-fields" class="type-fields" style="display: none;">
-      <div class="field">
-        <%= f.label :start_at %>
-        <%= f.datetime_local_field :start_at %>
-      </div>
-      <div class="field">
-        <%= f.label :end_at %>
-        <%= f.datetime_local_field :end_at %>
-      </div>
+     <div class="field">
+      <%= f.label :start_at %>
+      <%
+       start_val = task.start_at&.strftime('%Y-%m-%dT%H:%M') || 
+                  (params[:task] && params[:task][:start_at]) || 
+                  (params[:deadline] ? "#{params[:deadline]}T09:00" : nil)
+      %>
+      <%= f.datetime_local_field :start_at, value: start_val %>
+     </div>
+    <div class="field">
+      <%= f.label :end_at %>
+      <%
+      end_val = task.end_at&.strftime('%Y-%m-%dT%H:%M') || 
+                (params[:task] && params[:task][:end_at]) || 
+                (params[:deadline] ? "#{params[:deadline]}T10:00" : nil)
+      %>
+      <%= f.datetime_local_field :end_at, value: end_val %>
     </div>
+   </div>
 
     <div class="field">
       <%= f.label :description %>
