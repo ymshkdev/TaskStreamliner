@@ -77,6 +77,22 @@
       <%= f.text_area :description %>
     </div>
 
+  <%# チーム選択（SlimSelect） %>
+  <div class="field">
+    <%= f.label :team_ids, "共有設定" %> <%# ラベルも少し分かりやすく変更 %>
+    <div class="slim-select-wrapper">
+      <%= f.collection_select :team_ids, current_user.teams, :id, :name, 
+          { include_blank: true }, 
+          { 
+            multiple: true, 
+            id: "team-select", 
+            class: "form-control",
+            style: "width: 100%;" 
+          } 
+      %>
+    </div>
+  </div>
+
     <div class="field">
       <%= f.label :priority %>
       <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
@@ -106,90 +122,98 @@
 
 <%# JavaScriptで表示・非表示を切り替え %>
 <script>
-  function applyTaskTypeFields() {
-    const todoFields = document.getElementById('todo-fields');
-    const scheduleFields = document.getElementById('schedule-fields');
-    const statusField = document.getElementById('status-field');
-    const checkedElement = document.querySelector('.type-selector:checked');
-    
-    // 両方の入力欄を取得
-    const startAtInput = document.querySelector('input[name="task[start_at]"]');
-    const deadlineInput = document.querySelector('input[name="task[deadline]"]');
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedDate = urlParams.get('deadline');
+  // すべての関数を一つのスコープにまとめ、重複を排除します
+  (function() {
+    function applyTaskTypeFields() {
+      const todoFields = document.getElementById('todo-fields');
+      const scheduleFields = document.getElementById('schedule-fields');
+      const statusField = document.getElementById('status-field');
+      const checkedElement = document.querySelector('.type-selector:checked');
+      
+      const startAtInput = document.querySelector('input[name="task[start_at]"]');
+      const deadlineInput = document.querySelector('input[name="task[deadline]"]');
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedDate = urlParams.get('deadline');
 
-    if (todoFields && scheduleFields && checkedElement) {
-      if (checkedElement.value === 'todo') {
-        // --- タスクの場合 ---
-        todoFields.style.display = 'block';
-        scheduleFields.style.display = 'none';
-        if (statusField) statusField.style.display = 'block'; // ステータスを表示
-        if (selectedDate && deadlineInput && !deadlineInput.value) { // タスクに切り替えた際、もし締切が空（エラーで消された等）ならURLの日付で復元
-          deadlineInput.value = `${selectedDate}T00:00`;
-        }
-      } else {
-        // --- 予定（スケジュール）の場合 ---
-        todoFields.style.display = 'none';
-        scheduleFields.style.display = 'block';
+      if (todoFields && scheduleFields && checkedElement) {
+        const isTodo = checkedElement.value === 'todo';
+        todoFields.style.display = isTodo ? 'block' : 'none';
+        scheduleFields.style.display = isTodo ? 'none' : 'block';
+        if (statusField) statusField.style.display = isTodo ? 'block' : 'none';
 
-        // ポイント：
-        // 1. URLに日付がある（カレンダー経由）
-        // 2. まだ入力欄が空（初めて切り替えた）
-        // この時だけ自動セット。入力エラーで戻った時は input に値が入っているので上書きされない。
-        if (statusField) statusField.style.display = 'none'; // ステータスを非表示にする
-        if (selectedDate && startAtInput && !startAtInput.value) {
-          startAtInput.value = `${selectedDate}T09:00`;
-          handleAutoFill(); 
+        if (selectedDate) {
+          if (isTodo && deadlineInput && !deadlineInput.value) {
+            deadlineInput.value = `${selectedDate}T00:00`;
+          } else if (!isTodo && startAtInput && !startAtInput.value) {
+            startAtInput.value = `${selectedDate}T09:00`;
+            handleAutoFill();
+          }
         }
       }
     }
-  }
 
-  function setupTimeAutoFill() {
-    const startAtInput = document.querySelector('input[name="task[start_at]"]');
-    if (startAtInput) {
-      startAtInput.removeEventListener('change', handleAutoFill);
-      startAtInput.addEventListener('change', handleAutoFill);
+    function handleAutoFill() {
+      const startAtInput = document.querySelector('input[name="task[start_at]"]');
+      const endAtInput = document.querySelector('input[name="task[end_at]"]');
+      if (startAtInput && startAtInput.value && endAtInput && !endAtInput.value) {
+        const startDate = new Date(startAtInput.value);
+        startDate.setHours(startDate.getHours() + 1);
+        const format = (d) => d.toString().padStart(2, '0');
+        endAtInput.value = `${startDate.getFullYear()}-${format(startDate.getMonth() + 1)}-${format(startDate.getDate())}T${format(startDate.getHours())}:${format(startDate.getMinutes())}`;
+      }
     }
-  }
 
-  function handleAutoFill() {
-    const startAtInput = document.querySelector('input[name="task[start_at]"]');
-    const endAtInput = document.querySelector('input[name="task[end_at]"]');
+    function initSlimSelect(retryCount = 0) {
+      const el = document.getElementById('team-select');
+      if (!el) return;
+
+      // 既に初期化済みなら何もしない
+      if (el.dataset.ssInit) return;
+
+      if (typeof SlimSelect !== 'undefined') {
+        new SlimSelect({
+          select: '#team-select',
+          settings: {
+            // ここで「未選択＝プライベート」と表示させる
+            placeholderText: 'プライベート（外部共有なし）',
+            allowDeselect: true, // 選択を解除して空に戻せるようにする
+            closeOnSelect: false
+          }
+        });
+        el.dataset.ssInit = "true";
+        console.log("SlimSelect起動完了");
+      } else if (retryCount < 20) {
+        // まだ読み込み終わっていなければ0.1秒待って再トライ
+        setTimeout(() => initSlimSelect(retryCount + 1), 100);
+      }
+    }
+
+    function initAll() {
+      applyTaskTypeFields();
+      initSlimSelect();
+      
+      // イベントリスナーの再設定
+      document.querySelectorAll('.type-selector').forEach(el => {
+        el.removeEventListener('change', applyTaskTypeFields);
+        el.addEventListener('change', applyTaskTypeFields);
+      });
+
+      const startAtInput = document.querySelector('input[name="task[start_at]"]');
+      if (startAtInput) {
+        startAtInput.removeEventListener('change', handleAutoFill);
+        startAtInput.addEventListener('change', handleAutoFill);
+      }
+    }
+
+    // Turboイベントへの登録（ここを1セットに集約）
+    document.addEventListener('turbo:load', initAll);
+    document.addEventListener('turbo:render', initAll);
     
-    // 終了時間が空の時だけ自動計算
-    if (startAtInput && startAtInput.value && endAtInput) {
-      const startDate = new Date(startAtInput.value);
-      startDate.setHours(startDate.getHours() + 1);
-      
-      const year = startDate.getFullYear();
-      const month = String(startDate.getMonth() + 1).padStart(2, '0');
-      const day = String(startDate.getDate()).padStart(2, '0');
-      const hours = String(startDate.getHours()).padStart(2, '0');
-      const minutes = String(startDate.getMinutes()).padStart(2, '0');
-      
-      endAtInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    // 初回実行
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
     }
-  }
-
-  function setupTypeSelectorEvents() {
-    document.querySelectorAll('.type-selector').forEach(el => {
-      el.removeEventListener('change', applyTaskTypeFields);
-      el.addEventListener('change', applyTaskTypeFields);
-    });
-  }
-
-  // --- 実行指示（load/render両方対応） ---
-  document.addEventListener('turbo:load', () => {
-    applyTaskTypeFields();
-    setupTypeSelectorEvents();
-    setupTimeAutoFill();
-  });
-
-  document.addEventListener('turbo:render', () => {
-    applyTaskTypeFields();
-    setupTypeSelectorEvents();
-    setupTimeAutoFill();
-  });
+  })();
 </script>
