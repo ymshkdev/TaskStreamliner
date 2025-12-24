@@ -4,5 +4,9 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  has_many :tasks,dependent: :destroy
+  has_many :memberships, dependent: :destroy
+  has_many :teams, through: :memberships # 自分が所属しているチーム一覧を取得可能にする
+  has_many :tasks,dependent: :destroy # 自分が作成したタスク一覧
+
+  validates :name, presence: true
 end
