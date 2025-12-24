@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  before_validation :compact_team_ids
+
   belongs_to :user
   has_many :task_shares, dependent: :destroy
   has_many :teams, through: :task_shares
@@ -45,5 +47,9 @@ class Task < ApplicationRecord
     if end_at < start_at
       errors.add(:end_at, "は開始時間より後の時間に設定してください")
     end
+  end
+
+  def compact_team_ids
+  self.team_ids = team_ids.reject(&:blank?) if team_ids.present?
   end
 end

@@ -5,9 +5,13 @@ class TasksController < ApplicationController
    if params[:year] && params[:month]
     # 年月セレクトボックスからジャンプしてきた場合
     @start_date = Date.new(params[:year].to_i, params[:month].to_i, 1)
-   elsif params[:start_date]
-    # カレンダーの「前月」「次月」ボタンを押した場合
-    @start_date = Date.parse(params[:start_date])
+   elsif params[:start_date].present?
+    # 文字列が空でないか、正しくパースできるかチェック
+    begin
+      @start_date = Date.parse(params[:start_date].to_s)
+    rescue ArgumentError, Date::Error
+      @start_date = Date.today
+    end
    else
     # 何も指定がない場合は今日の日付
     @start_date = Date.today
@@ -20,14 +24,24 @@ class TasksController < ApplicationController
     month_start = @start_date.beginning_of_month.beginning_of_day
     month_end   = @start_date.end_of_month.end_of_day
 
-    # 2. カレンダー表示用：修正した範囲（month_start..month_end）を使う
-    @tasks = current_user.tasks.where(start_at: month_start..month_end)
-                               .or(current_user.tasks.where(deadline: month_start..month_end))
-     @todo_list = current_user.tasks
-                             .todo               # タイプがタスクのもの
-                             .status_todo        # ステータスが「未着手」
-                             .or(current_user.tasks.status_doing) # または「進行中」
-                             .order(priority: :desc, deadline: :asc)
+    # --- 2. 「表示対象のタスク（自分作成 + チーム共有）」のベースを作成 ---
+    # 自分が所属しているチームのIDを取得
+    my_team_ids = current_user.team_ids
+    # 自分が作った、または、自分のチームに共有されたタスクを統合
+    # left_outer_joins を使うことで、チーム共有がない（プライベートな）タスクも取得できます
+    all_visible_tasks = Task.left_outer_joins(:task_shares)
+                        .where(user_id: current_user.id)
+                        .or(Task.where(task_shares: { team_id: my_team_ids }))
+                        .distinct
+    # --- 3. カレンダー表示用（@tasks） ---
+    # all_visible_tasks に対して、期間の絞り込みをかける
+    @tasks = all_visible_tasks.where(start_at: month_start..month_end)
+                              .or(all_visible_tasks.where(deadline: month_start..month_end))
+    # --- 4. サイドバー等のToDoリスト用（@todo_list） ---
+    # all_visible_tasks に対して、未完了の絞り込みをかける
+    @todo_list = all_visible_tasks.todo
+                                  .where(status: [:todo, :doing]) # status_todo.or(status_doing)をスッキリ記述
+                                  .order(priority: :desc, deadline: :asc)
   end
   
   def new
@@ -137,7 +151,7 @@ end
 private
 
 def task_params
-  params.require(:task).permit(:title, :description, :deadline, :priority, :status, :task_type, :start_at, :end_at)
+  params.require(:task).permit(:title, :description, :deadline, :priority, :status, :task_type, :start_at, :end_at, :task_type,team_ids: [])
 end
 
 end
