@@ -27,7 +27,20 @@ class TeamsController < ApplicationController
 
   def show
     @team = Team.find(params[:id])
-    @members = @team.users
+    @members = @team.users.order('memberships.role DESC')
+    # ユーザーと一緒に、そのチームでの membership もまとめて取得(N+1対策)
+    @memberships = @team.memberships.includes(:user).order(role: :desc)
+  end
+
+  def destroy
+   @team = Team.find(params[:id])  
+   # リーダーだけがチームを削除（解散）できる
+   if current_user.leader_of?(@team)
+    @team.destroy
+    redirect_to teams_path, notice: "チーム「#{@team.name}」を削除しました。"
+   else
+    redirect_to team_path(@team), alert: "リーダー以外はチームを削除できません。"
+   end
   end
 
   private
