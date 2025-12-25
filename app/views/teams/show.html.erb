@@ -3,12 +3,16 @@
 <h3>メンバー一覧</h3>
 <ul>
   <% @members.each do |user| %>
+  <%# リーダーかどうかの判定をわかりやすく表示 %>
+    <% if user.leader_of?(@team) %>
+      <span class="badge bg-primary">リーダー</span>
+    <% end %>
     <li>
       <%= user.name %> (<%= user.email %>)
       <%# リーダーだけが他のメンバーを削除できる（自分自身は削除できない等の制御は後ほど） %>
       <% if current_user.leader_of?(@team) && user != current_user %>
         <%# そのユーザーのmembershipを探して削除ボタンを設置 %>
-        <% m = @team.memberships.find_by(user: user) %>
+        <% m = @team.memberships.find_by(user_id: user.id) %>
         <%= link_to "削除", team_membership_path(@team, m), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
       <% end %>
     </li>
@@ -16,7 +20,7 @@
 </ul>
 
 <hr>
-
+<% if current_user.leader_of?(@team) %>
 <h3>新しいメンバーを招待</h3>
 <%= form_with url: team_memberships_path(@team), local: true do |f| %>
   <div>
@@ -25,5 +29,19 @@
   </div>
   <%= f.submit "チームに招待する" %>
 <% end %>
-
+<div class="danger-zone">
+    <%= button_to "チームを削除（解散）する", team_path(@team), 
+                method: :delete,form: { data: { turbo_confirm: "本当に解散しますか？" } },
+                class: "btn btn-danger" %>
+  </div>
+  <% else %>
+  <%# リーダーじゃない人には、自分自身の脱退ボタンだけ見せる %>
+  <% my_membership = Membership.find_by(team_id: @team.id, user_id: current_user.id) %>
+  <% if my_membership %>
+  <%= link_to "チームを脱退する", team_membership_path(@team, my_membership), 
+              data: { turbo_method: :delete,
+              turbo_confirm:"チームを抜けますか？" }, 
+              class: "btn btn-warning" %>
+<% end %>
+<% end %>
 <%= link_to "一覧に戻る", teams_path %>
