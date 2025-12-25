@@ -34,6 +34,15 @@ ja:
       task_type:
         todo: "タスク"
         schedule: "予定"
+  time:
+    formats:
+      default: "%Y/%m/%d %H:%M:%S"
+      short: "%m/%d %H:%M"
+      long: "%Y年%m月%d日 %H時%m分"
   date:
     month_names: [nil, 1月, 2月, 3月, 4月, 5月, 6月, 7月, 8月, 9月, 10月, 11月, 12月]
     abbr_day_names: [日, 月, 火, 水, 木, 金, 土]
+    formats:
+      default: "%Y/%m/%d"
+      short: "%m/%d"
+      long: "%Y年%m月%d日"

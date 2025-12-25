@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :teams, through: :memberships # 自分が所属しているチーム一覧を取得可能にする
   has_many :tasks,dependent: :destroy # 自分が作成したタスク一覧
+  has_many :comments, dependent: :destroy #自分がコメントした一覧
 
   def leader_of?(team)
     # membershipsテーブルに「そのチームのリーダーである」というレコードがあるか確認
