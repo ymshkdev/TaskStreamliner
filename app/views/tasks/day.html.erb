@@ -91,30 +91,53 @@
       <% end %>
 
       <div class="events-container">
-        <% @day_tasks.each do |task| %>
-         <% status_class = task.done? ? 'completed-task' : '' %>
-          <% if task.schedule? %>
-            <% 
-              top = (task.start_at.hour * 60) + (task.start_at.min)
-              height = ((task.end_at - task.start_at) / 60).to_i
-            %>
-            <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px;">
-              <%= link_to edit_task_path(task, return_to: 'day', start_date: @start_date), class: "event-link" do %>
-               <div class="event-inner">
-                <strong><%= task.title %></strong>
-                <p><%= task.start_at.strftime("%H:%M") %> - <%= task.end_at.strftime("%H:%M") %></p>
-               </div>
-              <% end %>
-            </div>
-          <% elsif task.todo? && task.deadline.present? %>
-            <div class="deadline-line <%= status_class %>" style="top: <%= (task.deadline.hour * 60) + (task.deadline.min) %>px;">
-             <%= link_to edit_task_path(task, return_to: 'day', start_date: @start_date), class: "event-link" do %>
-              <span class="deadline-text">〆 <%= task.title %> (<%= task.deadline.strftime("%H:%M") %>)</span>
-             <% end %>
+  <% @day_tasks.each do |task| %>
+    <% status_class = task.done? ? 'completed-task' : '' %>
+    
+    <% if task.schedule? %>
+      <% 
+        # その日の「開始」と「終了」の基準
+        day_start = @date.beginning_of_day
+        day_end = @date.end_of_day
+
+        # 描画用の時間を計算（前日からの続きなら00:00から、翌日へ続くなら24:00まで）
+        display_start = [task.start_at, day_start].max
+        display_end = [task.end_at, day_end].min
+
+        # 表示位置（top）と高さ（height）を算出
+        top = (display_start.hour * 60) + (display_start.min)
+        height = ((display_end - display_start) / 60).to_i
+
+        # 表示用のテキスト
+        # 前日から跨いでいる場合は「前日〜」、翌日へ跨ぐ場合は「〜翌日」等の表記にする
+        start_str = task.start_at < day_start ? "前日" : task.start_at.strftime("%H:%M")
+        end_str = task.end_at > day_end ? "翌日" : task.end_at.strftime("%H:%M")
+      %>
+      
+      <%# heightが0以下の場合は描画しない（例えば24:00ちょうど終了のタスクなど） %>
+      <% if height > 0 %>
+        <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px;">
+          <%= link_to edit_task_path(task, return_to: 'day', start_date: @start_date), class: "event-link" do %>
+            <div class="event-inner">
+              <strong><%= task.title %></strong>
+              <p><%= start_str %> - <%= end_str %></p>
             </div>
           <% end %>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
+
+    <% elsif task.todo? && task.deadline.present? %>
+      <%# TODOの〆切表示（これはその日の範囲にある場合のみ表示） %>
+      <% if task.deadline.to_date == @date %>
+        <div class="deadline-line <%= status_class %>" style="top: <%= (task.deadline.hour * 60) + (task.deadline.min) %>px;">
+          <%= link_to edit_task_path(task, return_to: 'day', start_date: @start_date), class: "event-link" do %>
+            <span class="deadline-text">〆 <%= task.title %> (<%= task.deadline.strftime("%H:%M") %>)</span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
     </div>
   </div>
 </div>

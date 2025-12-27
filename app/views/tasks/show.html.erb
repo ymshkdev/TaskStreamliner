@@ -1,20 +1,32 @@
-<div class="task-detail-container">
+<%# カレンダーからのクリック時は turbo_frame_tag の中身だけが抜き出される %>
+<%= turbo_frame_tag "modal_task_detail" do %>
+ <div class="task-detail-container modal-style-adjust">
   <div class="task-card">
+
     <div class="task-header">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <%# タイプのバッジ（タスク or 予定） %>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+         <%# タイプのバッジ（タスク or 予定） %>
         <span class="type-badge type-<%= @task.task_type %>" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: #eee; color: #666;">
-          <%= @task.task_type_i18n %>
+         <%= @task.task_type_i18n %>
         </span>
         <%# 優先度バッジ %>
         <span class="priority-badge priority-<%= @task.priority %>">
           <%= @task.priority_i18n if @task.priority %>
         </span>
       </div>
-      <h2><%= @task.title %></h2>
-    </div>
+      <%# --- モーダル内限定：クイックステータス変更 --- %>
+          <% if @task.todo? %>
+            <div class="quick-status-edit">
+              <%= form_with(model: @task, class: "quick-status-form") do |f| %>
+                <%= f.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, {}, 
+                    { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
 
-    <div class="task-body">
+    <div class="task-body"style="margin-top: 20px;">
       <% if @task.todo? %>
         <%# タスク（締切）の場合 %>
         <div class="info-group">
@@ -60,11 +72,14 @@
 <%= render "comments/form", task: @task, comment: Comment.new %>
 
     <div class="task-actions">
-      <%= link_to "編集する", edit_task_path(@task), class: "btn-edit" %>
+      <%= link_to "編集する", edit_task_path(@task), data: { turbo_frame: "_top" }, class: "btn-edit" %>
       <%= link_to "削除する", task_path(@task), 
                   data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, 
                   class: "btn-delete" %>
+      <% unless request.headers["Turbo-Frame"] %>
       <%= link_to "カレンダーに戻る", tasks_path, class: "btn-back" %>
+      <% end %>
     </div>
   </div>
-</div>
+ </div>
+<% end %>

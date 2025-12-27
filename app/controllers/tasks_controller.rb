@@ -109,11 +109,19 @@ end
 
  def update
   if @task.update(task_params)
-    redirect_to tasks_path, notice: "予定を更新しました"
+    respond_to do |format|
+      # 「保存する」ボタンが押された（＝詳細編集画面からの）場合は、カレンダーへリダイレクト
+      if params[:commit] == "保存する"
+        format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
+      else
+        # ボタン以外（＝インデックスでのチェック操作など）は Turbo Stream でその場を更新
+        format.turbo_stream
+      end
+    end
   else
     render :edit, status: :unprocessable_entity
   end
- end
+end
 
  def destroy
   @task.destroy

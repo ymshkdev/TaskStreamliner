@@ -646,3 +646,71 @@
 .section-opened .chevron {
   transform: rotate(180deg);
 }
+
+/* モーダルの中に表示されている時だけのスタイル調整 */
+turbo-frame#modal_task_detail .task-card {
+  box-shadow: none;
+  border: none;
+  padding: 10px;
+  margin: 0;
+}
+
+/* モーダル時は「戻る」ボタンを隠す */
+turbo-frame#modal_task_detail .modal-hide {
+  display: none;
+}
+
+/* クイックステータス変更のセレクトボックス */
+.status-select-small {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+}
+
+/* モーダルの外枠：最初は透明にして浮かせる */
+.modal-overlay {
+  display: none;
+  position: fixed; /* absoluteではなくfixedで画面全体をロック */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.1); /* ほんの少し暗くして「外側」であることを示す */
+  z-index: 2000;
+}
+
+.modal-overlay.is-visible {
+  display: block;
+}
+
+/* 吹き出しの三角 */
+.modal-overlay::before {
+  content: "";
+  position: absolute;
+  border: 10px solid transparent;
+}
+
+/* 右側に表示される時用（例） */
+.modal-right::before {
+  top: 20px; left: -20px; border-right-color: white;
+}
+/* 左側に表示される時用（例） */
+.modal-left::before {
+  top: 20px; right: -20px; border-left-color: white;
+}
+
+/* 実際に詳細が表示される白い箱（吹き出し） */
+.modal-content {
+  position: absolute; /* modal-overlayを基準に配置 */
+  background: white;
+  min-width: 350px;
+  max-width: 450px;
+  max-height: 90vh; /* 画面高さを超えないように制限 */
+  overflow-y: auto; /* 長すぎる場合は窓内スクロール */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  padding: 20px;
+  z-index: 2001;
+}

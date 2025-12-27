@@ -1,0 +1,23 @@
+<div id="<%= dom_id(task) %>" class="task-entry <%= task.task_type %> <%= "status-#{task.status}" if task.todo? || task.schedule? %>" data-team-id="<%= task.teams.first&.id %>">
+  <%# 予定 (schedule) の場合：時間を表示 %>
+  <% if task.schedule? && task.start_at.present? %>
+    <span style="font-size: 0.8em; color: #666;">
+      <%= task.start_at.strftime("%H:%M") %> - <%= task.end_at.strftime("%H:%M") %>
+    </span>
+  <% end %>
+
+  <%# タスク (todo) の場合：〆時間を表示 %>
+  <% if task.todo? && task.deadline.present? %>
+    <div class="task-deadline-time" style="font-size: 0.75em; color: #d9534f; font-weight: bold; line-height: 1.2;">
+      〆 <%= task.deadline.strftime("%H:%M") %>
+    </div>
+  <% end %>
+
+  <%# タイトル部分 %>
+  <%= link_to task_path(task), data: { turbo_frame: "modal_task_detail", action: "click->modal#open" }, class: "task-link" do %>
+    <% if task.todo? && task.priority_high? %>
+      <span title="優先度：高">🚩</span>
+    <% end %>
+    <%= task.title %>
+  <% end %>
+</div>
