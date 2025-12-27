@@ -505,3 +505,36 @@
   color: #333;
   transform: scale(1.2); /* 少し大きくする */
 }
+
+/* サイドバーの基本設定 */
+.task-sidebar {
+  width: 280px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  height: fit-content;
+  position: sticky;
+  top: 20px; /* スクロールしてもついてくる */
+}
+
+.sidebar-task-item {
+  list-style: none;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.status-tag {
+  background: #eee;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
