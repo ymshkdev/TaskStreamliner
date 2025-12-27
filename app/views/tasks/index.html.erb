@@ -9,7 +9,7 @@
 <%= stylesheet_link_tag "tasks_index" %>
 
 <%# 3. カレンダーとサイドバーを囲む横並びコンテナ %>
-<div class="dashboard-layout" data-controller="sidebar" data-sidebar-target="container">
+<div class="dashboard-layout" data-controller="sidebar modal" data-sidebar-target="container">
   <%# 開くボタン %>
   <button type="button" class="toggle-button" data-action="click->sidebar#toggle">
     ☰ <small>メニュー</small>
@@ -51,34 +51,26 @@
    </div>
 
     <div class="day-body">
-      <% tasks.each do |task| %>
-       <div class="task-entry <%= task.task_type %> <%= "status-#{task.status}" if task.todo? %>" data-team-id="<%= task.teams.first&.id %>">
-        <%# 予定（schedule）かつ開始時間がある場合、開始時間(HH:mm)~終了時間(HH:mm)を表示 %>
-        <% if task.schedule? && task.start_at.present? %>
-         <span style="font-size: 0.8em; color: #666;">
-          <%= task.start_at.strftime("%H:%M") %> 〜 <%= task.end_at.strftime("%H:%M") %>
-         </span>
-        <% end %>
-
-        <%# --- タスク (todo) の場合：〆時間を表示 --- %>
-        <% if task.todo? && task.deadline.present? %>
-         <div class="task-deadline-time" style="font-size: 0.75em; color: #d9534f; font-weight: bold; line-height: 1.2;">
-          〆 <%= task.deadline.strftime("%H:%M") %>
-         </div>
-        <% end %>
-        <%# タイトル部分（優先度アイコン付き） %>
-        <%= link_to task_path(task), class: "task-link" do %>
-         <% if task.todo? && task.priority_high? %>
-          <span title="優先度：高">🚩</span>
-          <% end %>
-         <%= task.title %>
-         <% end %>
-       </div>
-      <% end %>
-     </div>
+  <% tasks.each do |task| %>
+    <%= turbo_frame_tag dom_id(task) do %>
+      <%= render partial: 'tasks/task_entry', locals: { task: task } %>
+    <% end %>
+  <% end %>
+</div>
     <% end %>
   </div>
 
+<%# サブメニュー %>
+<div id="task-modal" 
+     class="modal-overlay" 
+     data-modal-target="overlay"
+     data-action="click->modal#closeOutside">
+  <div class="modal-content" data-modal-target="content">
+    <%# 読み込み完了イベント(turbo:frame-load)をキャッチして再計算させる %>
+    <%= turbo_frame_tag "modal_task_detail", 
+                        data: { action: "turbo:frame-load->modal#reposition" } %>
+  </div>
+</div>
 
 <script>
   function setupDirectJump() {
