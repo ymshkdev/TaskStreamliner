@@ -8,8 +8,23 @@
 <%# 2. CSS読み込み %>
 <%= stylesheet_link_tag "tasks_index" %>
 
-<%# 3. カレンダー全体を囲むコンテナ %>
-<div class="calendar-container">
+<%# 3. カレンダーとサイドバーを囲む横並びコンテナ %>
+<div class="dashboard-layout" data-controller="sidebar" data-sidebar-target="container">
+  <%# 開くボタン %>
+  <button type="button" class="toggle-button" data-action="click->sidebar#toggle">
+    ☰ <small>未完了タスク</small>
+  </button>
+
+  <%# サイドバー本体 %>
+  <aside class="task-sidebar">
+    <%= render 'sidebar', todo_list: @todo_list %>
+  </aside>
+
+  <%# サイドバーが開いている時だけ出る「背景の黒い影」 %>
+  <div class="sidebar-overlay" data-action="click->sidebar#close"></div>
+
+  <%# --- 右：カレンダーコンテナ --- %>
+  <div class="calendar-container" style="flex: 1; min-width: 0;">
   
   <%= month_calendar(events: @tasks, attribute: :start_time, start_date: @start_date) do |date, tasks| %>
     
@@ -59,37 +74,10 @@
          <% end %>
        </div>
       <% end %>
-    </div>
-    
-  <% end %>
-  
-</div>
-
-<hr>
-<div class="todo-priority-list">
-  <h3>📌 未完了タスク（優先度順）</h3>
-  <ul>
-    <% @todo_list.each do |todo| %>
-      <li style="margin-bottom: 5px;">
-        <%# 優先度アイコン %>
-        <% if todo.priority_high? %><span style="color: red;">🚩</span><% end %>
-        <% if todo.priority_middle? %><span style="color: orange;">🔶</span><% end %>
-        
-        <%# 締切日とタイトル %>
-        <small><%= todo.deadline.strftime("%m/%d") %>(<%= I18n.t('date.abbr_day_names')[todo.deadline.wday] %>) <%= todo.deadline.strftime("%H:%M") %></small>
-        <strong><%= link_to todo.title, task_path(todo) %></strong>
-        
-        <%# ステータス表示（日本語） %>
-        <span class="badge" style="font-size: 0.8em; background: #eee;">
-          <%= I18n.t "enums.task.status.#{todo.status}" %>
-        </span>
-      </li>
+     </div>
     <% end %>
-  </ul>
-</div>
-<div style="margin-bottom: 20px;">
-  <%= link_to 'チーム管理・作成', teams_path, class: 'btn' %>
-</div>
+  </div>
+
 
 <script>
   function setupDirectJump() {

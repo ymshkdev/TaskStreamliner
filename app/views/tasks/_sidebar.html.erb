@@ -1,0 +1,29 @@
+<aside class="task-sidebar">
+  <div class="todo-priority-list">
+    <h3>📌 未完了タスク</h3>
+    <button type="button" 
+          data-action="click->sidebar#close" 
+          class="close-sidebar-btn" 
+          style="background: none; border: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: #888;">
+    &times;
+  </button>
+    <ul>
+      <% todo_list.each do |todo| %>
+        <li class="sidebar-task-item">
+          <div class="task-top">
+            <% if todo.priority_high? %><span class="prio-icon">🚩</span><% end %>
+            <% if todo.priority_middle? %><span class="prio-icon">🔶</span><% end %>
+            <strong><%= link_to todo.title, task_path(todo) %></strong>
+          </div>
+          <div class="task-meta">
+            <small><%= todo.deadline.strftime("%m/%d") %>(<%= I18n.t('date.abbr_day_names')[todo.deadline.wday] %>) <%= todo.deadline.strftime("%H:%M") %></small>
+            <span class="status-tag"><%= I18n.t "enums.task.status.#{todo.status}" %></span>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+    <div class="sidebar-actions">
+      <%= link_to 'チーム管理・作成', teams_path, class: 'btn-secondary' %>
+    </div>
+  </div>
+</aside>
