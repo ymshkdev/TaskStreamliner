@@ -9,10 +9,19 @@
 <%= stylesheet_link_tag "tasks_index" %>
 
 <%# 3. カレンダーとサイドバーを囲む横並びコンテナ %>
-<div class="dashboard-layout" style="display: flex; gap: 20px;">
-  
-  <%# --- 左：サイドバー部品を呼び出す --- %>
-  <%= render 'sidebar', todo_list: @todo_list %>
+<div class="dashboard-layout" data-controller="sidebar" data-sidebar-target="container">
+  <%# 開くボタン %>
+  <button type="button" class="toggle-button" data-action="click->sidebar#toggle">
+    ☰ <small>未完了タスク</small>
+  </button>
+
+  <%# サイドバー本体 %>
+  <aside class="task-sidebar">
+    <%= render 'sidebar', todo_list: @todo_list %>
+  </aside>
+
+  <%# サイドバーが開いている時だけ出る「背景の黒い影」 %>
+  <div class="sidebar-overlay" data-action="click->sidebar#close"></div>
 
   <%# --- 右：カレンダーコンテナ --- %>
   <div class="calendar-container" style="flex: 1; min-width: 0;">

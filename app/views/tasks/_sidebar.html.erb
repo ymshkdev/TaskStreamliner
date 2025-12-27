@@ -1,6 +1,12 @@
 <aside class="task-sidebar">
   <div class="todo-priority-list">
     <h3>📌 未完了タスク</h3>
+    <button type="button" 
+          data-action="click->sidebar#close" 
+          class="close-sidebar-btn" 
+          style="background: none; border: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: #888;">
+    &times;
+  </button>
     <ul>
       <% todo_list.each do |todo| %>
         <li class="sidebar-task-item">
