@@ -597,3 +597,52 @@
   cursor: pointer;
   margin-bottom: 15px;
 }
+
+.task-entry.is-faded {
+  opacity: 0.2; /* かなり薄くする */
+  filter: grayscale(100%); /* 白黒にしても見やすい */
+  pointer-events: none; /* クリックもできないようにする（任意） */
+  transition: opacity 0.3s;
+}
+
+/* セクションのタイトル（クリック可能にする） */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 5px;
+  background: #eee;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.section-title:hover {
+  background: #e0e0e0;
+}
+
+/* 初めは中身を隠す */
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  padding: 0 5px;
+}
+
+/* クラスがついた時だけ中身を見せる */
+.section-opened .section-content {
+  max-height: 500px; /* 十分な高さを指定 */
+  margin-bottom: 15px;
+}
+
+/* 矢印のアニメーション */
+.chevron {
+  font-size: 0.6rem;
+  transition: transform 0.3s;
+}
+
+.section-opened .chevron {
+  transform: rotate(180deg);
+}
