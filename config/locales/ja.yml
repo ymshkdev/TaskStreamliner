@@ -1,4 +1,5 @@
 ja:
+  # --- 1. ActiveRecord関連 ---
   activerecord:
     models:
       task: "タスク"
@@ -21,6 +22,15 @@ ja:
           attributes:
             name:
               taken: "はすでに存在します"
+
+  # --- 2. 共通エラーメッセージ ---
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      blank: "を入力してください"
+      invalid: "は不正な値です"
+
+  # --- 3. Enum関連 ---
   enums:
     task:
       status:
@@ -34,6 +44,8 @@ ja:
       task_type:
         todo: "タスク"
         schedule: "予定"
+
+  # --- 4. 時間・日付関連 ---
   time:
     formats:
       default: "%Y/%m/%d %H:%M:%S"
