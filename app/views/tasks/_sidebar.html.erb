@@ -1,29 +1,66 @@
-<aside class="task-sidebar">
-  <div class="todo-priority-list">
-    <h3>📌 未完了タスク</h3>
-    <button type="button" 
-          data-action="click->sidebar#close" 
-          class="close-sidebar-btn" 
-          style="background: none; border: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: #888;">
-    &times;
-  </button>
-    <ul>
-      <% todo_list.each do |todo| %>
-        <li class="sidebar-task-item">
-          <div class="task-top">
-            <% if todo.priority_high? %><span class="prio-icon">🚩</span><% end %>
-            <% if todo.priority_middle? %><span class="prio-icon">🔶</span><% end %>
-            <strong><%= link_to todo.title, task_path(todo) %></strong>
-          </div>
-          <div class="task-meta">
-            <small><%= todo.deadline.strftime("%m/%d") %>(<%= I18n.t('date.abbr_day_names')[todo.deadline.wday] %>) <%= todo.deadline.strftime("%H:%M") %></small>
-            <span class="status-tag"><%= I18n.t "enums.task.status.#{todo.status}" %></span>
-          </div>
+<%# 1. ヘッダー部分（タイトルと×ボタン） %>
+<div class="sidebar-inner-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+  <h3 style="margin: 0;">📅 メニュー</h3>
+  <button type="button" data-action="click->sidebar#close" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+</div>
+
+<%# 2. 所属チームセクション %>
+<section class="sidebar-section">
+  <h4 class="section-title" data-action="click->sidebar#toggleSection">
+    <span>👥 所属チーム</span>
+    <span class="chevron">▼</span>
+  </h4>
+  <div class="section-content">
+    <%# --- クイックフィルター：自分の予定のみ表示 --- %>
+    <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #d93025; font-weight: bold; font-size: 0.85rem;">
+        <input type="checkbox" 
+               data-action="change->sidebar#toggleMyTasksOnly"
+               style="width: 16px; height: 16px;">
+        👤 自分の予定のみ表示
+      </label>
+    </div>
+    <%# --- チームリスト --- %>
+    <ul class="team-list" style="list-style: none; padding: 0;">
+      <% current_user.teams.each do |team| %>
+        <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <input type="checkbox" checked data-team-id="<%= team.id %>" data-action="change->sidebar#toggleTeamDisplay">
+          <%= link_to team.name, team_path(team), style: "text-decoration: none; color: inherit; font-weight: bold;" %>
         </li>
       <% end %>
     </ul>
-    <div class="sidebar-actions">
-      <%= link_to 'チーム管理・作成', teams_path, class: 'btn-secondary' %>
-    </div>
   </div>
-</aside>
+</section>
+
+<%# 3. 未完了タスクセクション %>
+<section class="sidebar-section">
+  <h4 class="section-title" data-action="click->sidebar#toggleSection">
+    <span>📌 未完了タスク</span>
+    <span class="chevron">▼</span>
+  </h4>
+  <div class="section-content">
+    <ul style="list-style: none; padding: 0;">
+      <% todo_list.each do |todo| %>
+        <li class="sidebar-task-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+          <strong><%= link_to todo.title, task_path(todo), style: "text-decoration: none; color: #333;" %></strong>
+          <div style="font-size: 0.7rem; color: #888;">〆 <%= todo.deadline.strftime("%m/%d %H:%M") %></div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</section>
+
+<%# 4. 通知セクション %>
+<section class="sidebar-section">
+  <h4 class="section-title" data-action="click->sidebar#toggleSection">
+    <span>🔔 通知</span>
+    <span class="chevron">▼</span>
+  </h4>
+  <div class="section-content">
+    <p style="font-size: 0.8rem; color: #999;">新しい通知はありません</p>
+  </div>
+</section>
+
+<div class="sidebar-actions" style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+  <%= link_to 'チーム管理・作成', teams_path, class: 'btn-secondary', style: "font-size: 0.9rem;" %>
+</div>

@@ -12,7 +12,7 @@
 <div class="dashboard-layout" data-controller="sidebar" data-sidebar-target="container">
   <%# 開くボタン %>
   <button type="button" class="toggle-button" data-action="click->sidebar#toggle">
-    ☰ <small>未完了タスク</small>
+    ☰ <small>メニュー</small>
   </button>
 
   <%# サイドバー本体 %>
@@ -24,6 +24,7 @@
   <div class="sidebar-overlay" data-action="click->sidebar#close"></div>
 
   <%# --- 右：カレンダーコンテナ --- %>
+  
   <div class="calendar-container" style="flex: 1; min-width: 0;">
   
   <%= month_calendar(events: @tasks, attribute: :start_time, start_date: @start_date) do |date, tasks| %>
@@ -51,7 +52,7 @@
 
     <div class="day-body">
       <% tasks.each do |task| %>
-       <div class="task-entry <%= task.task_type %> <%= "status-#{task.status}" if task.todo? %>">
+       <div class="task-entry <%= task.task_type %> <%= "status-#{task.status}" if task.todo? %>" data-team-id="<%= task.teams.first&.id %>">
         <%# 予定（schedule）かつ開始時間がある場合、開始時間(HH:mm)~終了時間(HH:mm)を表示 %>
         <% if task.schedule? && task.start_at.present? %>
          <span style="font-size: 0.8em; color: #666;">
