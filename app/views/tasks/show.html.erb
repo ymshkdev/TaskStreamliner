@@ -52,30 +52,12 @@
 <h4>コメント</h4>
 
 <div id="comments">
-  <% @task.comments.each do |comment| %>
-    <div class="comment" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-      <strong><%= comment.user.name %></strong>: 
-      <%= comment.content %>
-      <small class="text-muted">(<%= l comment.created_at, format: :short %>)</small>
-
-      <%# 権限がある場合のみ削除ボタンを表示 %>
-      <% if comment.user == current_user || @task.teams.any? { |team| current_user.leader_of?(team) } %>
-        <%= link_to "削除", task_comment_path(@task, comment), 
-                    data: { turbo_method: :delete, turbo_confirm: "コメントを削除しますか？" }, 
-                    class: "text-danger", style: "font-size: 0.8rem; margin-left: 10px;" %>
-      <% end %>
-    </div>
-  <% end %>
+  <%= render @task.comments %>
 </div>
 
 <hr>
 
-<%= form_with(model: [@task, Comment.new], local: true) do |f| %>
-  <div class="mb-3">
-    <%= f.text_area :content, class: "form-control", placeholder: "コメントを入力..." %>
-  </div>
-  <%= f.submit "投稿する", class: "btn btn-primary" %>
-<% end %>
+<%= render "comments/form", task: @task, comment: Comment.new %>
 
     <div class="task-actions">
       <%= link_to "編集する", edit_task_path(@task), class: "btn-edit" %>

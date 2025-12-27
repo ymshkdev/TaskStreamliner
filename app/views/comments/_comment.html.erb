@@ -1,0 +1,12 @@
+<%# dom_id を使うことで、HTML要素に comment_123 のような一意のIDが付きます %>
+<div id="<%= dom_id(comment) %>" class="comment" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+  <strong><%= comment.user&.name %></strong>: 
+  <%= comment.content %>
+  <small class="text-muted">(<%= l comment.created_at, format: :short %>)</small>
+
+  <% if comment.user == current_user || @task.teams.any? { |team| current_user.leader_of?(team) } %>
+    <%= link_to "削除", task_comment_path(comment.task, comment), 
+                data: { turbo_method: :delete, turbo_confirm: "削除しますか？" }, 
+                class: "text-danger", style: "font-size: 0.8rem; margin-left: 10px;" %>
+  <% end %>
+</div>

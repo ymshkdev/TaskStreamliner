@@ -1,0 +1,5 @@
+<%# コメント一覧の最後に、新しいコメントを追加 %>
+<%= turbo_stream.append "comments", partial: "comments/comment", locals: { comment: @comment } %>
+
+<%# 投稿フォームを空にする %>
+<%= turbo_stream.replace "new_comment", partial: "comments/form", locals: { task: @task, comment: Comment.new } %>
