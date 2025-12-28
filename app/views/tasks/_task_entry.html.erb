@@ -2,9 +2,21 @@
   <%# 予定 (schedule) の場合：時間を表示 %>
   <% if task.schedule? && task.start_at.present? %>
     <span style="font-size: 0.8em; color: #666;">
+     <% if task.start_at.to_date == task.end_at.to_date %>
+      <%# 1. 同日の場合：通常通り 10:00 - 12:00 %>
       <%= task.start_at.strftime("%H:%M") %> - <%= task.end_at.strftime("%H:%M") %>
-    </span>
-  <% end %>
+    <% else %>
+      <%# 2. 日をまたぐ場合 %>
+      <% if date == task.start_at.to_date %>
+        <span style="color: #007bff; font-weight: bold;">(始)</span> <%= task.start_at.strftime("%H:%M") %>〜
+      <% elsif date == task.end_at.to_date %>
+        〜<%= task.end_at.strftime("%H:%M") %> <span style="color: #dc3545; font-weight: bold;">(終)</span>
+      <% else %>
+        <span style="color: #6c757d; font-weight: bold;">(継続中)</span>
+      <% end %>
+    <% end %>
+  </span>
+<% end %>
 
   <%# タスク (todo) の場合：〆時間を表示 %>
   <% if task.todo? && task.deadline.present? %>

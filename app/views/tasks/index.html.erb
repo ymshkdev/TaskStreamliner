@@ -53,7 +53,7 @@
     <div class="day-body">
   <% tasks.each do |task| %>
     <%= turbo_frame_tag dom_id(task) do %>
-      <%= render partial: 'tasks/task_entry', locals: { task: task } %>
+      <%= render partial: 'tasks/task_entry', locals: { task: task, date: date } %>
     <% end %>
   <% end %>
 </div>

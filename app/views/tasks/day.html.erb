@@ -100,9 +100,13 @@
         day_start = @date.beginning_of_day
         day_end = @date.end_of_day
 
+        # ---  日またぎ判定フラグ ---
+    is_from_yesterday = task.start_at < day_start
+    is_to_tomorrow = task.end_at > day_end
+
         # 描画用の時間を計算（前日からの続きなら00:00から、翌日へ続くなら24:00まで）
         display_start = [task.start_at, day_start].max
-        display_end = [task.end_at, day_end].min
+    display_end = [task.end_at, day_end].min
 
         # 表示位置（top）と高さ（height）を算出
         top = (display_start.hour * 60) + (display_start.min)
@@ -110,18 +114,27 @@
 
         # 表示用のテキスト
         # 前日から跨いでいる場合は「前日〜」、翌日へ跨ぐ場合は「〜翌日」等の表記にする
-        start_str = task.start_at < day_start ? "前日" : task.start_at.strftime("%H:%M")
-        end_str = task.end_at > day_end ? "翌日" : task.end_at.strftime("%H:%M")
+        start_str = is_from_yesterday ? "前日" : task.start_at.strftime("%H:%M")
+    end_str = is_to_tomorrow ? "翌日" : task.end_at.strftime("%H:%M")
+
+    # --- 5. つなぎ目のスタイル調整（追加：点線にする工夫） ---
+    # 前日からなら上を平らに、翌日までなら下を平らにするCSS
+    multi_day_style = ""
+    multi_day_style += "border-top: 2px dashed #999; border-top-left-radius: 0; border-top-right-radius: 0;" if is_from_yesterday
+    multi_day_style += "border-bottom: 2px dashed #999; border-bottom-left-radius: 0; border-bottom-right-radius: 0;" if is_to_tomorrow
       %>
       
       <%# heightが0以下の場合は描画しない（例えば24:00ちょうど終了のタスクなど） %>
       <% if height > 0 %>
-        <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px;">
+        <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px; <%= multi_day_style %>">
           <%= link_to edit_task_path(task, return_to: 'day', start_date: @start_date), class: "event-link" do %>
             <div class="event-inner">
-              <strong><%= task.title %></strong>
-              <p><%= start_str %> - <%= end_str %></p>
-            </div>
+          <strong>
+            <%# 前日からなら矢印をつける %>
+            <%= "↑ " if is_from_yesterday %><%= task.title %><%= " ↓" if is_to_tomorrow %>
+          </strong>
+          <p><%= start_str %> - <%= end_str %></p>
+        </div>
           <% end %>
         </div>
       <% end %>

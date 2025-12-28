@@ -40,6 +40,12 @@ class Task < ApplicationRecord
     todo? ? deadline : start_at
   end
 
+  def end_time
+    # todo（タスク）の場合は開始と同じ（1日だけ表示）
+    # schedule（予定）の場合は終了時間を使用（複数日にまたがって表示）
+    todo? ? deadline : (end_at || start_at)
+  end
+
   private
 
   # 予定の終了時間が開始時間より前にならないようにチェック
