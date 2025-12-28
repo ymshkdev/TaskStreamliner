@@ -39,7 +39,7 @@
     <span class="chevron">▼</span>
   </h4>
   <div class="section-content">
-    <ul style="list-style: none; padding: 0;">
+    <ul id="sidebar_todo_list" style="list-style: none; padding: 0;">
       <% todo_list.each do |todo| %>
         <li class="sidebar-task-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
           <strong><%= link_to todo.title, task_path(todo), style: "text-decoration: none; color: #333;" %></strong>
