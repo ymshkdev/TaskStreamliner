@@ -134,17 +134,20 @@ end
  def day
   # 1. 右側に表示する「特定の1日」のデータ
   @date = params[:date] ? Date.parse(params[:date]) : Date.today
-  day_range = @date.beginning_of_day..@date.end_of_day
+  day_start = @date.beginning_of_day
+  day_end   = @date.end_of_day
   # --- 1. 「自分が見て良い全タスク」のベース ---
   my_team_ids = current_user.team_ids
   visible_tasks = Task.left_outer_joins(:task_shares)
                       .where(user_id: current_user.id)
                       .or(Task.where(task_shares: { team_id: my_team_ids }))
                       .distinct
-   # --- 2. その中から、特定の日のデータを抽出 ---
-  @day_tasks = visible_tasks.where(start_at: day_range)
-                            .or(visible_tasks.where(deadline: day_range))
-                            .order(:start_at, :deadline)
+   # --- 2. 検索条件：今日という日が「開始と終了の間」に1秒でも重なっていれば取得 ---
+  @day_tasks = visible_tasks.where(
+    "(start_at <= ? AND end_at >= ?) OR (deadline >= ? AND deadline <= ?)",
+    day_end, day_start,
+    day_start, day_end
+  ).order(:start_at, :deadline).distinct
 
   # 3. 左側の「ミニカレンダー」が「何月」を表示するかを決定
   # URLにstart_dateがあればそれを優先。なければ表示中の日の月初にする。
@@ -154,9 +157,12 @@ end
   month_start = @start_date.beginning_of_month.beginning_of_day
   month_end   = @start_date.end_of_month.end_of_day
   
-  @month_tasks = visible_tasks.where(start_at: month_start..month_end)
-                              .or(visible_tasks.where(deadline: month_start..month_end))
-
+  @month_tasks = visible_tasks.where(
+    "(start_at <= ? AND end_at >= ?) OR (deadline >= ? AND deadline <= ?)",
+    month_end, month_start,
+    month_start, month_end
+  ).distinct
+  
   # 3. 未完了タスク
   @todo_list = visible_tasks.todo
                             .where(status: [:todo, :doing])
