@@ -1,3 +1,14 @@
 <%= turbo_stream.replace dom_id(@task) do %>
   <%= render partial: 'tasks/task_entry', locals: { task: @task } %>
 <% end %>
+
+<%= turbo_stream.update "sidebar_todo_list" do %>
+  <% @user_todo_list.each do |todo| %>
+    <li class="sidebar-task-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+      <strong><%= link_to todo.title, task_path(todo), style: "text-decoration: none; color: #333;" %></strong>
+      <div style="font-size: 0.7rem; color: #888;">
+        〆 <%= todo.deadline&.strftime("%m/%d %H:%M") %>
+      </div>
+    </li>
+  <% end %>
+<% end %>

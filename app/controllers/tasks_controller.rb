@@ -109,6 +109,7 @@ end
 
  def update
   if @task.update(task_params)
+    @user_todo_list = current_user.tasks.todo.not_done
     respond_to do |format|
       # 「保存する」ボタンが押された（＝詳細編集画面からの）場合は、カレンダーへリダイレクト
       if params[:commit] == "保存する"
