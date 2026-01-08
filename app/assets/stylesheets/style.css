@@ -328,3 +328,49 @@ a {
   background-color: rgba(0, 0, 0, 0.03);
   transition: background 0.2s;
 }
+
+.simple-selector-group {
+  margin-bottom: 1.5rem;
+
+  .selector-label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+  }
+}
+
+/* 横並び・等間隔のコンテナ */
+.selector-row {
+  display: flex;
+  justify-content: flex-start; /* 左寄せ */
+  align-items: center;
+  gap: 20px; /* 選択肢同士の最低限の隙間 */
+}
+
+/* 各選択肢（〇 텍スト） */
+.selector-item {
+  flex: 1; /* これで等間隔に広がります */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0;
+  font-size: 0.95rem;
+
+  /* ラジオボタン（〇）のスタイル */
+  .selector-input {
+    margin-right: 8px; /* 〇と文字の間の隙間 */
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+  }
+
+  .selector-text {
+    white-space: nowrap;
+  }
+
+  &:hover .selector-text {
+    color: #007bff;
+  }
+}
