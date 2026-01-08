@@ -93,19 +93,35 @@
     </div>
   </div>
 
-    <div class="field">
-      <%= f.label :priority %>
-      <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] } %>
-    </div>
+   <%# 優先度選択 %>
+<div class="field simple-selector-group">
+  <%= f.label :priority, class: "selector-label" %>
+  <div class="selector-row">
+    <%= f.collection_radio_buttons :priority, Task.priorities.keys, :to_s, :to_s do |b| %>
+      <label class="selector-item">
+        <%= b.radio_button(class: "selector-input") %>
+        <span class="selector-text">
+          <%= b.value == 'high' ? "🚩 高" : I18n.t("enums.task.priority.#{b.value}") %>
+        </span>
+      </label>
+    <% end %>
+  </div>
+</div>
 
     <%# ステータス選択（タスクの時だけ表示したいのでIDを付与） %>
-    <div id="status-field" class="field">
-     <%= f.label :status %>
-     <%= f.select :status, 
-               Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, 
-               {}, 
-               class: "form-control" %>
-    </div>
+ <div id="status-field" class="field simple-selector-group">
+  <%= f.label :status, class: "selector-label" %>
+  <div class="selector-row">
+    <%= f.collection_radio_buttons :status, Task.statuses.keys, :to_s, :to_s do |b| %>
+      <label class="selector-item">
+        <%= b.radio_button(class: "selector-input") %>
+        <span class="selector-text">
+          <%= I18n.t("enums.task.status.#{b.value}") %>
+        </span>
+      </label>
+    <% end %>
+  </div>
+</div>
 
     <div class="actions">
       <%= f.submit "保存する", class: "submit-btn" %>
