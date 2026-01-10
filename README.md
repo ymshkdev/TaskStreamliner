@@ -72,6 +72,7 @@ https://gyazo.com/931a202949fcf48286cd86e12e925b79
 - **自動テストの拡充**: RSpecを用いて、日またぎの境界値テスト（深夜0時を跨ぐ場合など）の自動化を強化する。
 
 ## データベース設計
+```mermaid
 erDiagram
     users ||--o{ tasks : "作成"
     users ||--o{ comments : "投稿"
@@ -126,6 +127,8 @@ erDiagram
         text content
         datetime created_at
     }
+  ```
+
 ## 画面変遷図
 graph TD
     %% ログイン前
