@@ -130,6 +130,7 @@ erDiagram
   ```
 
 ## 画面変遷図
+```mermaid
 graph TD
     %% ログイン前
     Start((開始)) --> Login[ログイン画面]
@@ -154,6 +155,7 @@ graph TD
     %% スタイル設定
     style Start fill:#f9f,stroke:#333,stroke-width:2px
     style Calendar fill:#bbf,stroke:#333,stroke-width:4px
+```
 
 ## 開発環境
 - **言語・フレームワーク**: Ruby / Ruby on Rails
