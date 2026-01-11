@@ -430,3 +430,117 @@ button.cancel-link:hover {
   width: 100%;
   box-sizing: border-box;
 }
+
+.modal-task-container {
+  .modal-task-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .task-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .task-body-content {
+    .info-group {
+      margin-bottom: 1rem;
+      label {
+        display: block;
+        color: #888;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+      }
+    }
+
+    .status-edit-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* セレクトボックスの共通デザイン */
+  .select-priority, .select-status {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 2px 8px;
+    background-color: #f8f9fa;
+    font-size: 0.85rem;
+    cursor: pointer;
+    &:hover {
+      background-color: #e9ecef;
+    }
+  }
+}
+
+/* 詳細モーダル全体のレイアウト修正 */
+.task-detail-container {
+  /* 1. タイトル上の不自然な空白を除去 */
+  padding-top: 0 !important; 
+  
+  .modal-task-title {
+    display: block !important;
+    width: 100%;
+    margin: 0 0 15px 0 !important; /* 上の余白をゼロに、下だけ空ける */
+    padding: 0;
+  }
+
+  /* 2. ヘッダーをブロック化（横並び崩れの波及を止める） */
+  .task-header {
+    display: block !important; 
+    margin-bottom: 20px;
+
+    /* バッジ類が並ぶ行だけをFlexにする */
+    > div:first-child {
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0;
+    }
+  }
+
+  /* 3. 各情報グループを「上から下のブロック」へ強制 */
+  .task-body {
+    display: block !important;
+    margin-top: 10px !important;
+
+    .info-group {
+      display: block !important; /* 基本は縦並び */
+      width: 100%;
+      margin-bottom: 15px;
+      clear: both;
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+      }
+    }
+
+    /* 4. ステータス行：ここだけ「ラベルと選択肢」を横に並べる */
+    .info-group[style*="display: flex"], 
+    .info-group[style*="flex"] {
+      display: flex !important; 
+      align-items: center;
+      gap: 10px;
+      
+      strong {
+        white-space: nowrap; /* 「ステータス:」の改行を防止 */
+      }
+    }
+  }
+
+  /* セレクトボックスの幅を適切に（短く） */
+  .status-select-small {
+    width: auto !important;
+    min-width: 100px;
+    padding: 2px 4px;
+  }
+}
