@@ -2,6 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["overlay", "content"]
+  
+  connect() {
+    // ページが読み込まれた（または遷移した）時にモーダルを確実に閉じる
+    this.close();
+  }
 
   // 1. 最初にクリックされた時
   open(event) {
@@ -46,6 +51,7 @@ export default class extends Controller {
   // 3. Turbo Frameの中身が読み込まれた時に呼ばれる
   // HTML側で <turbo-frame data-action="turbo:frame-load->modal#reposition"> と書く
   close() {
+    this.lastClickRect = null;
     this.overlayTarget.classList.remove("is-visible");
     const frame = this.element.querySelector("turbo-frame");
     if (frame) frame.src = "";
