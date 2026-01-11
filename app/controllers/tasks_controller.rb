@@ -85,10 +85,10 @@ class TasksController < ApplicationController
     # --- 戻り先による分岐 ---
     if params[:return_to] == 'day'
       # dayページに戻る。表示していた月(start_date)も引き継ぐ
-      redirect_to day_tasks_path(date: (@task.start_at || @task.deadline).to_date, start_date: params[:start_date]), notice: "保存しました"
+      redirect_to day_tasks_path(date: (@task.start_at || @task.deadline).to_date, start_date: params[:start_date]),status: :see_other, notice: "保存しました"
     else
       # 通常のカレンダー画面に戻る
-      redirect_to tasks_path(start_date: (@task.start_at || @task.deadline).to_date), notice: "保存しました"
+      redirect_to tasks_path(start_date: (@task.start_at || @task.deadline).to_date),status: :see_other, notice: "保存しました"
     end
     # ----------------------------
   else
@@ -127,7 +127,6 @@ end
  def destroy
   @task.destroy
   # 削除した後はカレンダー画面に戻る
-  # status: :see_other は Rails 7 (Turbo) で推奨されているリダイレクトのステータスです
   redirect_to tasks_path, notice: "予定を削除しました", status: :see_other
  end
 

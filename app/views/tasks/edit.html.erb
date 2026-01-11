@@ -1,3 +1,8 @@
-<h2>新規登録</h2>
+<%= turbo_frame_tag "modal_task_detail" do %>
+  <div class="task-edit-modal">
+    <h2>編集</h2>
 
 <%= render 'form', task: @task %>
+
+  </div>
+<% end %>

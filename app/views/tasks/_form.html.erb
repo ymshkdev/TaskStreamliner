@@ -1,5 +1,5 @@
 <div class="task-form-container">
-  <%= form_with(model: task, local: true) do |f| %>
+  <%= form_with(model: task, data: { turbo_frame: "_top" }) do |f| %>
     <%# エラー表示（以前のものを継続） %>
     <%# --- 追加：戻り先情報をコントローラーに引き渡す --- %>
     <%= hidden_field_tag :return_to, @return_to %>
@@ -125,12 +125,20 @@
 
     <div class="actions">
       <%= f.submit "保存する", class: "submit-btn" %>
+
+      <% if request.headers["Turbo-Frame"] %>
+      <%# モーダル内の場合：既存のCSSクラスを使いつつ、挙動だけをJavaScriptに変更 %>
+      <button type="button"data-action="click->modal#close" class="cancel-link">
+      キャンセル
+      </button>
+      <% else %>
       <% if @return_to == 'day' %>
       <%# dayページから来た場合は、表示していた日(@date)と表示していた月(@start_date)に戻す %>
       <%= link_to 'キャンセル', day_tasks_path(date: task.start_at&.to_date || task.deadline&.to_date || Date.today, start_date: @start_date), class: "cancel-link" %>
       <% else %>
       <%# それ以外（index）から来た場合は、通常のカレンダー画面に戻す %>
       <%= link_to 'キャンセル', tasks_path(start_date: @start_date), class: "cancel-link" %>
+      <% end %>
       <% end %>
     </div>
   <% end %>
