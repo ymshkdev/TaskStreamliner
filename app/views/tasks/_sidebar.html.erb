@@ -42,7 +42,9 @@
     <ul id="sidebar_todo_list" style="list-style: none; padding: 0;">
       <% todo_list.each do |todo| %>
         <li class="sidebar-task-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-          <strong><%= link_to todo.title, task_path(todo), style: "text-decoration: none; color: #333;" %></strong>
+          <strong>
+            <%= link_to todo.title, task_path(todo),style: "text-decoration: none; color: #333;",data: {turbo_frame: "modal_task_detail", action: "click->modal#open"} %>
+          </strong>
           <div style="font-size: 0.7rem; color: #888;">〆 <%= todo.deadline.strftime("%m/%d %H:%M") %></div>
         </li>
       <% end %>
