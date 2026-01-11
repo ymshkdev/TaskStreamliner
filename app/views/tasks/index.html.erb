@@ -24,7 +24,6 @@
   <div class="sidebar-overlay" data-action="click->sidebar#close"></div>
 
   <%# --- 右：カレンダーコンテナ --- %>
-  
   <div class="calendar-container" style="flex: 1; min-width: 0;">
   
   <%= month_calendar(events: @tasks, attribute: :start_time, start_date: @start_date) do |date, tasks| %>
@@ -44,7 +43,7 @@
        </div>
       <% end %>
      </div>
-     <%# 右側：＋マーク（新規登録ページへ） %>
+     <%# 右側：＋マーク（新規登録モーダル） %>
      <%= link_to new_task_path(selected_date: date), class: "add-task-btn", title: "新規登録", style: "text-decoration: none; color: #999;",data: { turbo_frame: "modal_task_detail",action: "click->modal#open"} do %>
       <span class="plus-icon" style="font-size: 1.2rem; line-height: 1;">&plus;</span>
      <% end %>
@@ -56,9 +55,9 @@
       <%= render partial: 'tasks/task_entry', locals: { task: task, date: date } %>
     <% end %>
   <% end %>
-</div>
-    <% end %>
   </div>
+    <% end %>
+</div>
 
 <%# サブメニュー %>
 <div id="task-modal" 
@@ -70,7 +69,8 @@
     <%= turbo_frame_tag "modal_task_detail", 
                         data: { action: "turbo:frame-load->modal#reposition" } %>
   </div>
-</div>
+ </div>
+ </div>
 
 <script>
   function setupDirectJump() {

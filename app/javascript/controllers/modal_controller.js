@@ -25,58 +25,32 @@ export default class extends Controller {
 
   const rect = this.lastClickRect;
   const content = this.contentTarget;
-  const isDayPage = !!document.querySelector(".day-timeline"); // Dayページ判定
-  
-  // 1. 基本となる要素のサイズと画面情報を取得
-    const modalWidth = content.offsetWidth;
-    const modalHeight = content.offsetHeight;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-  // 1. 左右位置の計算（画面右端での折り返し）
-  if (isDayPage) {
-      // --- Dayページの場合は画面中央に固定（画像の問題を確実に防ぐ） ---
-      content.style.position = "fixed";
-      content.style.top = "50%";
-      content.style.left = "50%";
-      content.style.transform = "translate(-50%, -50%)";
-      content.style.margin = "0";
-    } else {
-      // --- それ以外（index等）はクリック位置に合わせる ---
-      content.style.position = "absolute";
-      content.style.transform = "none";
+  // 全て fixed で統一。これで親要素の構造に左右されなくなります。
+  content.style.position = "fixed";
+  content.style.transform = "none";
 
-      // サイドバーの右端を取得して左側の限界線にする
-      const sidebar = document.querySelector(".sidebar");
-      const leftLimit = sidebar ? sidebar.getBoundingClientRect().right + 10 : 10;
+  const modalWidth = content.offsetWidth;
+  const modalHeight = content.offsetHeight;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
 
-      // 左右位置の計算
-      let leftPos = rect.right + 10;
-      // 右にはみ出すなら左側に置く
-      if (leftPos + modalWidth > viewportWidth - 10) {
-        leftPos = rect.left - modalWidth - 10;
-      }
-      // 【重要】左に置いた結果、左限界（サイドバー）を突き抜けるなら限界線で止める
-      if (leftPos < leftLimit) {
-        leftPos = leftLimit;
-      }
+  // 1. 左右位置：クリックした場所の右側（はみ出るなら左側）
+  let leftPos = rect.right + 10;
+  if (leftPos + modalWidth > viewportWidth - 10) {
+    leftPos = rect.left - modalWidth - 10;
+  }
+  if (leftPos < 10) leftPos = 10; // 画面左端のガード
 
-      // 上下位置の計算
-      let topPos = rect.top + scrollY;
-      const viewTop = scrollY + 10;
-      const viewBottom = scrollY + viewportHeight - 20;
+  // 2. 上下位置：クリックした場所の高さ（fixedなのでスクロール量は足さない！）
+  let topPos = rect.top; 
+  if (topPos + modalHeight > viewportHeight - 10) {
+    topPos = viewportHeight - modalHeight - 10;
+  }
+  if (topPos < 10) topPos = 10; // 画面上端のガード
 
-      if (topPos + modalHeight > viewBottom) {
-        topPos = viewBottom - modalHeight;
-      }
-      if (topPos < viewTop) {
-        topPos = viewTop;
-      }
-
-      content.style.left = `${leftPos}px`;
-      content.style.top = `${topPos}px`;
-    }
+  content.style.left = `${leftPos}px`;
+  content.style.top = `${topPos}px`;
   }
 
   // 3. Turbo Frameの中身が読み込まれた時に呼ばれる
@@ -88,7 +62,7 @@ export default class extends Controller {
       this.close();
     }
   }
-  
+
   close() {
     this.lastClickRect = null;
     this.overlayTarget.classList.remove("is-visible");
