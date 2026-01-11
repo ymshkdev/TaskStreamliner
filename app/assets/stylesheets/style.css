@@ -215,32 +215,66 @@ button.cancel-link:hover {
 }
 
 /* 予定ブロック */
-.events-container { position: absolute; top: 0; left: 60px; right: 20px; bottom: 0; pointer-events: none; }
-.event-block {
-  position: absolute; width: 90%;
-  background: #039be5; color: white;
-  border-radius: 4px; padding: 4px 8px;
-  font-size: 12px; pointer-events: auto;
+.events-container {
+  position: absolute; 
+  top: 0; 
+  left: 60px; 
+  right: 20px; 
+  bottom: 0; 
+  pointer-events: none; 
 }
+
+.event-block {
+  position: absolute; 
+  left: 0;
+  width: 90%;
+  background: rgba(3, 155, 229, 0.85);
+  color: white;
+  border-radius: 4px; 
+  padding: 4px 8px;
+  font-size: 12px; 
+  pointer-events: auto;
+  z-index: 10; /* 予定の重なり順 */
+}
+
 .deadline-line {
   position: absolute;
   width: 100%;
   border-top: 2px solid #ea4335;
   height: 20px;
   pointer-events: auto !important;
+  z-index: 50 !important; /* 予定（10）より圧倒的に高くして、常に一番上に */
+}
+
+/* 締め切りが重なった場合の縦ずれ（下方向） */
+.deadline-line + .deadline-line {
+  margin-top: 22px; 
 }
 
 .deadline-line .event-link {
   display: block;
   width: 100%;
-  height: 100%; /* これで20px分の高さすべてがボタンになる */
+  height: 20px; /* 当たり判定を20px確保 */
   cursor: pointer;
+  position: relative; /* 中のテキストの基準にする */
 }
 .deadline-text {
    background: #ea4335;
-   color: white;
-   font-size: 10px;
-   padding: 0 4px; }
+  color: white;
+  font-size: 10px;
+  padding: 1px 4px; /* 上下左右に少し余白 */
+  border-radius: 3px;
+  
+  /* --- ここが重要：線の上に浮かせる設定 --- */
+  position: absolute; /* 線に縛られず自由に配置 */
+  top: -12px;         /* 線より少し上に浮かせる */
+  left: 5px;          /* 左端から少し離す */
+  
+  white-space: nowrap;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* 予定（青）の上でも文字をくっきりさせる */
+  z-index: 60;        /* 予定よりも確実に手前に */
+  }
 
 /* --- サイドバー内カレンダーヘッダーの完全修正 --- */
 
@@ -557,3 +591,4 @@ button.cancel-link:hover {
     padding: 2px 4px;
   }
 }
+
