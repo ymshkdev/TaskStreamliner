@@ -215,19 +215,66 @@ button.cancel-link:hover {
 }
 
 /* 予定ブロック */
-.events-container { position: absolute; top: 0; left: 60px; right: 20px; bottom: 0; pointer-events: none; }
+.events-container {
+  position: absolute; 
+  top: 0; 
+  left: 60px; 
+  right: 20px; 
+  bottom: 0; 
+  pointer-events: none; 
+}
+
 .event-block {
-  position: absolute; width: 90%;
-  background: #039be5; color: white;
-  border-radius: 4px; padding: 4px 8px;
-  font-size: 12px; pointer-events: auto;
+  position: absolute; 
+  left: 0;
+  width: 90%;
+  background: rgba(3, 155, 229, 0.85);
+  color: white;
+  border-radius: 4px; 
+  padding: 4px 8px;
+  font-size: 12px; 
+  pointer-events: auto;
+  z-index: 10; /* 予定の重なり順 */
 }
+
 .deadline-line {
-  position: absolute; width: 100%;
+  position: absolute;
+  width: 100%;
   border-top: 2px solid #ea4335;
-  z-index: 5;
+  height: 20px;
+  pointer-events: auto !important;
+  z-index: 50 !important; /* 予定（10）より圧倒的に高くして、常に一番上に */
 }
-.deadline-text { background: #ea4335; color: white; font-size: 10px; padding: 0 4px; }
+
+/* 締め切りが重なった場合の縦ずれ（下方向） */
+.deadline-line + .deadline-line {
+  margin-top: 22px; 
+}
+
+.deadline-line .event-link {
+  display: block;
+  width: 100%;
+  height: 20px; /* 当たり判定を20px確保 */
+  cursor: pointer;
+  position: relative; /* 中のテキストの基準にする */
+}
+.deadline-text {
+   background: #ea4335;
+  color: white;
+  font-size: 10px;
+  padding: 1px 4px; /* 上下左右に少し余白 */
+  border-radius: 3px;
+  
+  /* --- ここが重要：線の上に浮かせる設定 --- */
+  position: absolute; /* 線に縛られず自由に配置 */
+  top: -12px;         /* 線より少し上に浮かせる */
+  left: 5px;          /* 左端から少し離す */
+  
+  white-space: nowrap;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* 予定（青）の上でも文字をくっきりさせる */
+  z-index: 60;        /* 予定よりも確実に手前に */
+  }
 
 /* --- サイドバー内カレンダーヘッダーの完全修正 --- */
 
@@ -430,3 +477,118 @@ button.cancel-link:hover {
   width: 100%;
   box-sizing: border-box;
 }
+
+.modal-task-container {
+  .modal-task-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .task-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .task-body-content {
+    .info-group {
+      margin-bottom: 1rem;
+      label {
+        display: block;
+        color: #888;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+      }
+    }
+
+    .status-edit-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* セレクトボックスの共通デザイン */
+  .select-priority, .select-status {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 2px 8px;
+    background-color: #f8f9fa;
+    font-size: 0.85rem;
+    cursor: pointer;
+    &:hover {
+      background-color: #e9ecef;
+    }
+  }
+}
+
+/* 詳細モーダル全体のレイアウト修正 */
+.task-detail-container {
+  /* 1. タイトル上の不自然な空白を除去 */
+  padding-top: 0 !important; 
+  
+  .modal-task-title {
+    display: block !important;
+    width: 100%;
+    margin: 0 0 15px 0 !important; /* 上の余白をゼロに、下だけ空ける */
+    padding: 0;
+  }
+
+  /* 2. ヘッダーをブロック化（横並び崩れの波及を止める） */
+  .task-header {
+    display: block !important; 
+    margin-bottom: 20px;
+
+    /* バッジ類が並ぶ行だけをFlexにする */
+    > div:first-child {
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0;
+    }
+  }
+
+  /* 3. 各情報グループを「上から下のブロック」へ強制 */
+  .task-body {
+    display: block !important;
+    margin-top: 10px !important;
+
+    .info-group {
+      display: block !important; /* 基本は縦並び */
+      width: 100%;
+      margin-bottom: 15px;
+      clear: both;
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+      }
+    }
+
+    /* 4. ステータス行：ここだけ「ラベルと選択肢」を横に並べる */
+    .info-group[style*="display: flex"], 
+    .info-group[style*="flex"] {
+      display: flex !important; 
+      align-items: center;
+      gap: 10px;
+      
+      strong {
+        white-space: nowrap; /* 「ステータス:」の改行を防止 */
+      }
+    }
+  }
+
+  /* セレクトボックスの幅を適切に（短く） */
+  .status-select-small {
+    width: auto !important;
+    min-width: 100px;
+    padding: 2px 4px;
+  }
+}
+

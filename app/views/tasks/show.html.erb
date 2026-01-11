@@ -2,8 +2,11 @@
 <%= turbo_frame_tag "modal_task_detail" do %>
  <div class="task-detail-container modal-style-adjust">
   <div class="task-card">
+    <%# 1. タイトルを最上部に表示 %>
+    <h2 class="modal-task-title" style="margin-bottom: 15px; font-weight: bold;"><%= @task.title %></h2>
 
     <div class="task-header">
+      
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
          <%# タイプのバッジ（タスク or 予定） %>
@@ -11,20 +14,12 @@
          <%= @task.task_type_i18n %>
         </span>
         <%# 優先度バッジ %>
-        <span class="priority-badge priority-<%= @task.priority %>">
-          <%= @task.priority_i18n if @task.priority %>
-        </span>
-      </div>
-      <%# --- モーダル内限定：クイックステータス変更 --- %>
-          <% if @task.todo? %>
-            <div class="quick-status-edit">
-              <%= form_with(model: @task, class: "quick-status-form") do |f| %>
-                <%= f.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, {}, 
-                    { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
-              <% end %>
-            </div>
+        <%= form_with(model: @task, class: "quick-edit-form") do |f| %>
+            <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] }, {}, 
+                { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
           <% end %>
-        </div>
+      </div>
+     </div>
 
     <div class="task-body"style="margin-top: 20px;">
       <% if @task.todo? %>
@@ -33,12 +28,14 @@
           <label>期限</label>
           <p><%= @task.deadline&.strftime("%Y年%m月%d日 %H:%M") || "未設定" %></p>
         </div>
-        <p>
-        <strong>ステータス:</strong>
-         <span class="status-label status-<%= @task.status %>">
-          <%= I18n.t "enums.task.status.#{@task.status}" %>
-         </span>
-        </p>
+
+        <div class="info-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <strong>ステータス:</strong>
+            <%= form_with(model: @task, class: "quick-status-form") do |f| %>
+              <%= f.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, {}, 
+                  { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
+            <% end %>
+          </div>
       <% else %>
         <%# 予定（期間）の場合 %>
         <div class="info-group">
