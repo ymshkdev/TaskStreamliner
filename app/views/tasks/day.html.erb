@@ -88,60 +88,10 @@
      </div>
      <% end %>
 
-     <div class="events-container">
-      <% @day_tasks.each do |task| %>
-      <% status_class = task.done? ? 'completed-task' : '' %>
-      <% if task.schedule? %>
-      <% 
-        # その日の「開始」と「終了」の基準
-        day_start = @date.beginning_of_day
-        day_end = @date.end_of_day
-        # ---  日またぎ判定フラグ ---
-        is_from_yesterday = task.start_at < day_start
-        is_to_tomorrow = task.end_at > day_end
-        # 描画用の時間を計算（前日からの続きなら00:00から、翌日へ続くなら24:00まで）
-        display_start = [task.start_at, day_start].max
-        display_end = [task.end_at, day_end].min
-        # 表示位置（top）と高さ（height）を算出
-        top = (display_start.hour * 60) + (display_start.min)
-        height = ((display_end - display_start) / 60).to_i
-        # 表示用のテキスト
-        # 前日から跨いでいる場合は「前日〜」、翌日へ跨ぐ場合は「〜翌日」等の表記にする
-        start_str = is_from_yesterday ? "前日" : task.start_at.strftime("%H:%M")
-        end_str = is_to_tomorrow ? "翌日" : task.end_at.strftime("%H:%M")
-        # --- 5. つなぎ目のスタイル調整（追加：点線にする工夫） ---
-        # 前日からなら上を平らに、翌日までなら下を平らにするCSS
-        multi_day_style = ""
-        multi_day_style += "border-top: 2px dashed #999; border-top-left-radius: 0; border-top-right-radius: 0;" if is_from_yesterday
-        multi_day_style += "border-bottom: 2px dashed #999; border-bottom-left-radius: 0; border-bottom-right-radius: 0;" if is_to_tomorrow
-      %>      
-      <%# heightが0以下の場合は描画しない（例えば24:00ちょうど終了のタスクなど） %>
-      <% if height > 0 %>
-       <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px; <%= multi_day_style %>">
-        <%= link_to task_path(task),class: "event-link", data: {turbo_frame: "modal_task_detail",action: "click->modal#open"} do %>
-         <div class="event-inner">
-         <strong>
-           <%# 前日からなら矢印をつける %>
-           <%= "↑ " if is_from_yesterday %><%= task.title %><%= " ↓" if is_to_tomorrow %>
-         </strong>
-          <p><%= start_str %> - <%= end_str %></p>
-         </div>
-          <% end %>
-        </div>
-      <% end %>
+    <div id="day_events_container">
+      <%= render 'tasks/day_events', day_tasks: @day_tasks, date: @date %>
+    </div>
 
-    <% elsif task.todo? && task.deadline.present? %>
-      <%# TODOの〆切表示（これはその日の範囲にある場合のみ表示） %>
-      <% if task.deadline.to_date == @date %>
-        <div class="deadline-line <%= status_class %>" style="top: <%= (task.deadline.hour * 60) + (task.deadline.min) %>px;">
-          <%= link_to task_path(task),class: "event-link",data: {turbo_frame: "modal_task_detail",action: "click->modal#open"} do %>
-            <span class="deadline-text">〆 <%= task.title %> (<%= task.deadline.strftime("%H:%M") %>)</span>
-          <% end %>
-        </div>
-      <% end %>
-    <% end %>
-  <% end %>
- </div>
  <%# 2. モーダルの「受け皿」をこのページにも設置 %>
   <div data-modal-target="overlay" class="modal-overlay" data-action="click->modal#closeOutside">
     <div data-modal-target="content" class="modal-content">
