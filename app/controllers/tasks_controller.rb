@@ -100,6 +100,9 @@ class TasksController < ApplicationController
 end
 
 def show
+  @task = Task.find(params[:id])
+  @return_to = params[:return_to] 
+  @date = params[:date]
 end
 
  def edit

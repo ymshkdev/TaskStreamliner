@@ -28,7 +28,7 @@
       <%# heightが0以下の場合は描画しない（例えば24:00ちょうど終了のタスクなど） %>
       <% if height > 0 %>
        <div class="event-block <%= status_class %>" style="top: <%= top %>px; height: <%= height %>px; <%= multi_day_style %>">
-        <%= link_to edit_task_path(task, return_to: 'day', date: @date, start_date: @start_date), class: "event-link", data: { turbo_frame: "modal_task_detail", action: "click->modal#open" } do %>
+        <%= link_to task_path(task, return_to: 'day', date: @date, start_date: @start_date), class: "event-link", data: { turbo_frame: "modal_task_detail", action: "click->modal#open" } do %>
          <div class="event-inner">
          <strong>
            <%# 前日からなら矢印をつける %>
@@ -44,7 +44,7 @@
       <%# TODOの〆切表示（これはその日の範囲にある場合のみ表示） %>
       <% if task.deadline.to_date == @date %>
         <div class="deadline-line <%= status_class %>" style="top: <%= (task.deadline.hour * 60) + (task.deadline.min) %>px;">
-          <%= link_to edit_task_path(task, return_to: 'day', date: @date, start_date: @start_date), class: "event-link", data: { turbo_frame: "modal_task_detail", action: "click->modal#open" } do %>
+          <%= link_to task_path(task, return_to: 'day', date: @date, start_date: @start_date), class: "event-link", data: { turbo_frame: "modal_task_detail", action: "click->modal#open" } do %>
             <span class="deadline-text">〆 <%= task.title %> (<%= task.deadline.strftime("%H:%M") %>)</span>
           <% end %>
         </div>
