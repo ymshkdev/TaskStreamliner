@@ -48,6 +48,17 @@
         </div>
       <% end %>
 
+      <% if @task.teams.any? %>
+  <div class="shared-teams">
+    <strong>共有中のチーム:</strong>
+    <ul>
+      <% @task.teams.each do |team| %>
+        <li><span class="badge"># <%= team.name %></span></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
       <div class="info-group">
         <label>メモ</label>
         <%# labelは常に出し、pタグの中身だけ条件分岐させます %>
