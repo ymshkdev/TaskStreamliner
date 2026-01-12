@@ -111,18 +111,29 @@ end
   if @task.update(task_params)
     @user_todo_list = current_user.tasks.todo.not_done
     respond_to do |format|
-      # 「保存する」ボタンが押された（＝詳細編集画面からの）場合は、カレンダーへリダイレクト
-      if params[:commit] == "保存する"
-        format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
-      else
-        # ボタン以外（＝インデックスでのチェック操作など）は Turbo Stream でその場を更新
-        format.turbo_stream
-      end
+      format.turbo_stream {
+        # start_at があればそれを、なければ deadline を、どちらもなければ今日の日付を代用する
+        display_date = @task.start_at&.to_date || @task.deadline&.to_date || Date.today
+        render turbo_stream:[ # 1. カレンダー全体を最新にする（これでマルチデイの色の矛盾やNameErrorを防ぐ）
+         turbo_stream.replace(helpers.dom_id(@task), 
+                               partial: 'tasks/task_entry', 
+                               locals: { task: @task, date: display_date }),
+          
+          # 2. サイドバーの未完了リスト（id="sidebar_todo_list"）だけをピンポイントで即座に書き換える
+         turbo_stream.update("sidebar_todo_list", 
+                              partial: "tasks/sidebar_todo_list", 
+                              locals: { todo_list: @user_todo_list }),
+          # 3. モーダルを閉じる
+         turbo_stream.append_all("body", "<script>document.querySelector('[data-controller=\"modal\"]').dispatchEvent(new CustomEvent('close'))</script>")
+        ]
+      }
+      # 念のため、普通のフォーム送信の場合
+      format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
     end
-  else
+   else
     render :edit, status: :unprocessable_entity
-  end
-end
+   end
+ end
 
  def destroy
   @task.destroy
@@ -166,7 +177,7 @@ end
   @todo_list = visible_tasks.todo
                             .where(status: [:todo, :doing])
                             .order(priority: :desc, deadline: :asc)
-end
+ end
 
 private
 
