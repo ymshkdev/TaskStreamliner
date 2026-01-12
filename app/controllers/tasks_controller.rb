@@ -124,7 +124,7 @@ end
                               partial: "tasks/sidebar_todo_list", 
                               locals: { todo_list: @user_todo_list }),
           # 3. モーダルを閉じる
-         turbo_stream.append_all("body", "<script>document.querySelector('[data-controller=\"modal\"]').dispatchEvent(new CustomEvent('close'))</script>")
+         turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
         ]
       }
       # 念のため、普通のフォーム送信の場合
