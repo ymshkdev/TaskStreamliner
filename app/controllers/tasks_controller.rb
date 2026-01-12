@@ -112,12 +112,13 @@ end
     @user_todo_list = current_user.tasks.todo.not_done
     respond_to do |format|
       format.turbo_stream {
+        current_date = params[:start_date].presence ? params[:start_date].to_date : Date.today
         # start_at があればそれを、なければ deadline を、どちらもなければ今日の日付を代用する
         display_date = @task.start_at&.to_date || @task.deadline&.to_date || Date.today
         render turbo_stream:[ # 1. カレンダー全体を最新にする（これでマルチデイの色の矛盾やNameErrorを防ぐ）
-         turbo_stream.replace(helpers.dom_id(@task), 
-                               partial: 'tasks/task_entry', 
-                               locals: { task: @task, date: display_date }),
+         turbo_stream.replace("calendar_container",
+                               partial: 'tasks/calendar', 
+                               locals: { tasks: current_user.tasks,start_date: current_date }),
           
           # 2. サイドバーの未完了リスト（id="sidebar_todo_list"）だけをピンポイントで即座に書き換える
          turbo_stream.update("sidebar_todo_list", 
