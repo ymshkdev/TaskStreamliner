@@ -103,8 +103,10 @@ def show
 end
 
  def edit
+  @task = Task.find(params[:id])
   @return_to = params[:return_to]
   @start_date = params[:start_date]
+  @date = params[:date]
  end
 
  def update
@@ -115,6 +117,25 @@ end
         current_date = params[:start_date].presence ? params[:start_date].to_date : Date.today
         # start_at があればそれを、なければ deadline を、どちらもなければ今日の日付を代用する
         display_date = @task.start_at&.to_date || @task.deadline&.to_date || Date.today
+        
+        if params[:return_to] == 'day'
+          # --- Dayページ（タイムライン）の処理 ---
+          @date = params[:date] ? params[:date].to_date : (@task.start_at&.to_date || Date.today)
+          @day_tasks = current_user.tasks.where('start_at <= ? AND end_at >= ?', @date.end_of_day, @date.beginning_of_day)
+
+          render turbo_stream: [
+            # Dayページのコンテナを差し替え
+            turbo_stream.replace("day_events_container",
+                                 partial: 'tasks/day_events',
+                                 locals: { day_tasks: @day_tasks, date: @date }),
+            # サイドバー更新
+            turbo_stream.update("sidebar_todo_list", 
+                                 partial: "tasks/sidebar_todo_list", 
+                                 locals: { todo_list: @user_todo_list }),
+            # モーダルを閉じる
+            turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
+          ]
+        else
         render turbo_stream:[ # 1. カレンダー全体を最新にする（これでマルチデイの色の矛盾やNameErrorを防ぐ）
          turbo_stream.replace("calendar_container",
                                partial: 'tasks/calendar', 
@@ -127,6 +148,7 @@ end
           # 3. モーダルを閉じる
          turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
         ]
+      end
       }
       # 念のため、普通のフォーム送信の場合
       format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
