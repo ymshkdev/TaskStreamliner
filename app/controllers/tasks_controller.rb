@@ -120,21 +120,36 @@ end
         
         if params[:return_to] == 'day'
           # --- Dayページ（タイムライン）の処理 ---
-          @date = params[:date] ? params[:date].to_date : (@task.start_at&.to_date || Date.today)
-          @day_tasks = current_user.tasks.where('start_at <= ? AND end_at >= ?', @date.end_of_day, @date.beginning_of_day)
+          # --- 1. 日付の決定：表示中の日(params[:date])を最優先し、タスクの開始日は無視する ---
+          @date = params[:date].presence ? Date.parse(params[:date]) : Date.today
+          day_start = @date.beginning_of_day
+          day_end   = @date.end_of_day
+          # --- 2. 表示権限のあるタスクを再取得（dayアクションと同じロジック） ---
+          my_team_ids = current_user.team_ids
+          visible_tasks = Task.left_outer_joins(:task_shares)
+                      .where(user_id: current_user.id)
+                      .or(Task.where(task_shares: { team_id: my_team_ids }))
+                      .distinct
+          # --- 3. その日に該当するタスクを抽出（dayアクションと完全に一致させる） ---
+          @day_tasks = visible_tasks.where(
+           "(start_at <= ? AND end_at >= ?) OR (deadline >= ? AND deadline <= ?)",
+            day_end, day_start,
+            day_start, day_end
+            ).order(:start_at, :deadline).distinct
 
           render turbo_stream: [
-            # Dayページのコンテナを差し替え
-            turbo_stream.replace("day_events_container",
-                                 partial: 'tasks/day_events',
-                                 locals: { day_tasks: @day_tasks, date: @date }),
-            # サイドバー更新
-            turbo_stream.update("sidebar_todo_list", 
-                                 partial: "tasks/sidebar_todo_list", 
-                                 locals: { todo_list: @user_todo_list }),
-            # モーダルを閉じる
-            turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
-          ]
+          # タイムライン部分のみをピンポイントで更新
+         turbo_stream.replace("day_events_container",
+                         partial: 'tasks/day_events',
+                         locals: { day_tasks: @day_tasks, date: @date }),
+    
+          # サイドバーのTODOリストも最新の状態に更新
+          turbo_stream.update("sidebar_todo_list", 
+                        partial: "tasks/sidebar_todo_list", 
+                        locals: { todo_list: visible_tasks.todo.where(status: [:todo, :doing]).order(priority: :desc, deadline: :asc) }),
+         # JSでモーダルを閉じる
+         turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
+         ]
         else
         render turbo_stream:[ # 1. カレンダー全体を最新にする（これでマルチデイの色の矛盾やNameErrorを防ぐ）
          turbo_stream.replace("calendar_container",
