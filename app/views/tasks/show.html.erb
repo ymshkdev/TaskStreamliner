@@ -69,7 +69,7 @@
 <%= render "comments/form", task: @task, comment: Comment.new %>
 
     <div class="task-actions">
-      <%= link_to "編集する", edit_task_path(@task, return_to: @return_to, date: @date, start_date: @start_date), class: "btn btn-primary" %>
+      <%= link_to "編集する", edit_task_path(@task, return_to: @return_to, date: @date, start_date: @start_date),data: { turbo_frame: "modal_task_detail" }, class:"btn-edit" %>
       <%= link_to "削除する", task_path(@task), 
                   data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？",turbo_frame: "_top" }, 
                   class: "btn-delete" %>
