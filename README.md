@@ -139,32 +139,39 @@ erDiagram
 
 ## 画面変遷図
 ```mermaid
-graph TD
+  graph TD
     %% ログイン前
     Start((開始)) --> Login[ログイン画面]
-    Start --> Signup[新規登録画面]
+    Start --> Signup[新規登録]
     
-    %% ログイン後（メイン）
-    Login --> Index[カレンダー画面 / index]
-    Signup --> Index
+    %% メイン遷移
+    Login --> Calendar[カレンダー]
+    Signup --> Calendar
     
-    %% カレンダーとDayページの相互遷移
-    Index <--> Day[Dayページ / タイムライン]
+    %% カレンダーからの派生
+    Calendar <--> Day[dayページ / タイムライン]
+    Calendar <--> TeamIndex[チーム管理 一覧]
     
-    %% Dayページ内での詳細・編集の流れ
-    Day --> TaskShow[タスク詳細モーダル / show]
-    TaskShow <--> TaskEdit[タスク編集モーダル / edit]
+    %% チーム管理からの遷移
+    TeamIndex --> TeamCreate[チーム作成]
+    TeamCreate --> TeamIndex
     
-    %% アクション後の戻り
-    TaskEdit -- "更新 (Turbo Stream)" --> Day
-    TaskNew[タスク作成モーダル] -- "作成" --> Day
-    Day --> TaskNew
+    TeamIndex --> TeamDetail[チーム詳細<br/>リーダー時: メンバー追加<br/>メンバー時: 脱退]
+    TeamDetail --> TeamIndex
+    
+    TeamIndex --> TeamManageList[チーム管理 一覧]
+    
+    %% タスク操作（一覧画面からの想定）
+    TeamIndex --> TaskShow[TaskShow]
+    TeamIndex --> TaskNew[TaskNew]
+    
+    TaskShow --> TaskEdit[Task編集モーダル]
+    TaskNew --> TaskUpdate[Task更新モーダル]
 
     %% スタイル設定
-    style Index fill:#bbf,stroke:#333,stroke-width:4px
-    style Day fill:#bbf,stroke:#333,stroke-width:4px
-    style TaskShow fill:#fff,stroke:#333,stroke-dasharray: 5 5
-    style TaskEdit fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style Start fill:#fff,stroke:#333
+    style Calendar fill:#fff,stroke:#333,stroke-width:2px
+    style TeamIndex fill:#fff,stroke:#333,stroke-width:2px
 ```
 
 ## 開発環境
