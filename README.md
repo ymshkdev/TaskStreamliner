@@ -139,27 +139,29 @@ erDiagram
 graph TD
     %% ログイン前
     Start((開始)) --> Login[ログイン画面]
-    Start --> Signup[ユーザー新規登録画面]
+    Start --> Signup[新規登録画面]
     
-    %% ログイン後
-    Login --> Calendar[カレンダーページ / メイン]
-    Signup --> Calendar
+    %% ログイン後（メイン）
+    Login --> Index[カレンダー画面 / index]
+    Signup --> Index
     
-    %% メインからの遷移
-    Calendar --> TaskNew[タスク・予定作成モーダル/画面]
-    Calendar --> DayDetail[Day詳細 / タイムラインページ]
+    %% カレンダーとDayページの相互遷移
+    Index <--> Day[Dayページ / タイムライン]
     
-    %% 詳細への遷移
-    DayDetail --> TaskDetail[タスク・予定詳細ページ]
-    TaskNew --> DayDetail
+    %% Dayページ内での詳細・編集の流れ
+    Day --> TaskShow[タスク詳細モーダル / show]
+    TaskShow <--> TaskEdit[タスク編集モーダル / edit]
     
-    %% 編集・削除の流れ
-    TaskDetail --> TaskEdit[編集・削除アクション]
-    TaskEdit --> DayDetail
-    
+    %% アクション後の戻り
+    TaskEdit -- "更新 (Turbo Stream)" --> Day
+    TaskNew[タスク作成モーダル] -- "作成" --> Day
+    Day --> TaskNew
+
     %% スタイル設定
-    style Start fill:#f9f,stroke:#333,stroke-width:2px
-    style Calendar fill:#bbf,stroke:#333,stroke-width:4px
+    style Index fill:#bbf,stroke:#333,stroke-width:4px
+    style Day fill:#bbf,stroke:#333,stroke-width:4px
+    style TaskShow fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style TaskEdit fill:#fff,stroke:#333,stroke-dasharray: 5 5
 ```
 
 ## 開発環境
