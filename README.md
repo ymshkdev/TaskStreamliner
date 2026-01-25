@@ -10,10 +10,15 @@
 https://taskstreamliner.onrender.com
 
 ## テスト用アカウント
-- Basic認証用ID：
-- Basic認証パスワード：
+- Basic認証用ID：admin
+- Basic認証パスワード：Task#AMdpcukGH2
+- テストユーザー1
 - メールアドレス：test@test
 - パスワード：testtest1
+- テストユーザー2
+- メールアドレス：test2@test
+- パスワード：testtest2
+
 
 # 利用方法
 1. **ユーザー登録・ログイン**:
@@ -34,10 +39,11 @@ https://taskstreamliner.onrender.com
 ## 実装した機能について
 ### 1. マルチデイ・タイムライン表示
 - 複数日にわたる予定を、中断することなく連続した予定として登録可能。
-https://gyazo.com/931a202949fcf48286cd86e12e925b79
+![インデックス画面のキャプチャ](public/images/index_page.png)
 
 ### 2. 直感的な入力UI
-- 登録した後のステータス変更、コメントの際、Javascriptを使用し、ページ読み込み不要に。
+- 登録した後のステータス変更やコメントの際、Javascriptを使用しモーダル機能を追加。ページ読み込み不要に。
+![モーダル画面のキャプチャ](public/images/modal.png)
 
 ### 3. 期間重複の判定ロジック
   SQLのクエリを工夫し、`(start_at <= 今日 AND end_at >= 今日)` という条件を用いることで、初日・中日・最終日のすべてのパターンを効率的に1つのクエリで取得するよう実装。
@@ -47,9 +53,10 @@ https://gyazo.com/931a202949fcf48286cd86e12e925b79
 
 ### 5.カレンダーの年月にJavascriptを使用し、数か月、数年先へのアクセスも容易に
   前月、次月ボタンでの月の切り替えは煩わしいと考え、年月の部分をクリックすることで数か月先のカレンダーへのアクセスを容易に。
+  ![インデックス画面gif](public/images/calendar.gif)
 
 ### 6.SlimSelectorを導入し、複数のチームとタスクや予定を共有可能に
-  同じタスク、予定を複数のチームで共有することもあると考え、複数のチームへ共有ができるように実装。
+  同じタスク、予定を複数のチームで共有することもあると考え、複数のチームへタスク共有ができるように実装。
 
 ### 7.チームはリーダーのみが解散権を持つ
   チームを作成したユーザーがリーダーとなり、チームの解散はリーダーのみが可能とした。
@@ -61,6 +68,7 @@ https://gyazo.com/931a202949fcf48286cd86e12e925b79
   チームのチェックマークを外すことでチームのタスクや予定をグレーアウトさせ、チームごとのタスクを可視化することが可能。
   また、「自分の予定のみ表示」にチェックマークをつけることで、プライベートな予定も可視化可能。
   また、所属チーム名をクリックすることでチーム詳細へアクセスが可能。
+  ![チーム機能gif](public/images/team.gif)
 
 ### 9.未完了タスクのリストアップ
   タスクの中でも未完了タスクをメニュー内にリストアップ。
@@ -69,7 +77,7 @@ https://gyazo.com/931a202949fcf48286cd86e12e925b79
 ## 改善点（今後の展望）
 - **重複した予定の警告**: 重複した予定が重なった場合、アラートを表示する機能を追加。
 - **通知機能の実装**: コメントがされた際の通知機能を追加。
-- **自動テストの拡充**: RSpecを用いて、日またぎの境界値テスト（深夜0時を跨ぐ場合など）の自動化を強化する。
+- **自動テストの拡充**: RSpecを用いて、テストの自動化を強化する。
 
 ## データベース設計
 ```mermaid
@@ -134,27 +142,29 @@ erDiagram
 graph TD
     %% ログイン前
     Start((開始)) --> Login[ログイン画面]
-    Start --> Signup[ユーザー新規登録画面]
+    Start --> Signup[新規登録画面]
     
-    %% ログイン後
-    Login --> Calendar[カレンダーページ / メイン]
-    Signup --> Calendar
+    %% ログイン後（メイン）
+    Login --> Index[カレンダー画面 / index]
+    Signup --> Index
     
-    %% メインからの遷移
-    Calendar --> TaskNew[タスク・予定作成モーダル/画面]
-    Calendar --> DayDetail[Day詳細 / タイムラインページ]
+    %% カレンダーとDayページの相互遷移
+    Index <--> Day[Dayページ / タイムライン]
     
-    %% 詳細への遷移
-    DayDetail --> TaskDetail[タスク・予定詳細ページ]
-    TaskNew --> DayDetail
+    %% Dayページ内での詳細・編集の流れ
+    Day --> TaskShow[タスク詳細モーダル / show]
+    TaskShow <--> TaskEdit[タスク編集モーダル / edit]
     
-    %% 編集・削除の流れ
-    TaskDetail --> TaskEdit[編集・削除アクション]
-    TaskEdit --> DayDetail
-    
+    %% アクション後の戻り
+    TaskEdit -- "更新 (Turbo Stream)" --> Day
+    TaskNew[タスク作成モーダル] -- "作成" --> Day
+    Day --> TaskNew
+
     %% スタイル設定
-    style Start fill:#f9f,stroke:#333,stroke-width:2px
-    style Calendar fill:#bbf,stroke:#333,stroke-width:4px
+    style Index fill:#bbf,stroke:#333,stroke-width:4px
+    style Day fill:#bbf,stroke:#333,stroke-width:4px
+    style TaskShow fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style TaskEdit fill:#fff,stroke:#333,stroke-dasharray: 5 5
 ```
 
 ## 開発環境
