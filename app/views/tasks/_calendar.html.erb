@@ -1,5 +1,12 @@
 <div id="calendar_container" class="calendar-container" style="flex: 1; min-width: 0;">
-  <%= month_calendar(events: tasks, attribute: :start_time, start_date: start_date, url: tasks_path) do |date, tasks_on_day| %>
+  <%= month_calendar(
+      events: tasks, 
+      attribute: :start_time, 
+      start_date: start_date, # コントローラーから渡された target_date をここで使う
+      # url: tasks_path は削除！
+      previous_link: ->(param, date_range) { link_to "«", tasks_path(start_date: date_range.first - 1.day) },
+      next_link: ->(param, date_range) { link_to "»", tasks_path(start_date: date_range.last + 1.day) }
+    ) do |date, tasks_on_day| %>
   <div class="day-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
      <%# 左側：日付と祝日名 %>
      <div>
@@ -16,7 +23,7 @@
       <% end %>
      </div>
      <%# 右側：＋マーク（新規登録モーダル） %>
-     <%= link_to new_task_path(selected_date: date), class: "add-task-btn", title: "新規登録", style: "text-decoration: none; color: #999;",data: { turbo_frame: "modal_task_detail",action: "click->modal#open"} do %>
+     <%= link_to new_task_path(selected_date: date, start_date: start_date), class: "add-task-btn", title: "新規登録", style: "text-decoration: none; color: #999;",data: { turbo_frame: "modal_task_detail",action: "click->modal#open"} do %>
       <span class="plus-icon" style="font-size: 1.2rem; line-height: 1;">&plus;</span>
      <% end %>
    </div>
@@ -24,7 +31,7 @@
     <div class="day-body">
   <% tasks_on_day.each do |task| %>
     <%= turbo_frame_tag dom_id(task) do %>
-      <%= render partial: 'tasks/task_entry', locals: { task: task, date: date } %>
+      <%= render partial: 'tasks/task_entry', locals: { task: task, date: date, start_date: start_date } %>
     <% end %>
   <% end %>
   </div>

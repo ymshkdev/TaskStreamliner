@@ -151,10 +151,21 @@ def update
             ]
           else
             # --- カレンダー（Index）の処理 ---
+            # target_date を作るだけでなく、params そのものを上書きする
+            # simple_calendar が内部で params[:start_date] を見た時に 該当の月になる
+            target_date = params[:start_date].presence || Date.today.to_s
+            params[:start_date] = target_date
             # 1. 描画用のタスクを取得（Indexと同じ条件にする）
-            all_tasks = current_user.tasks # 必要に応じて共有タスクも含める
+            my_team_ids = current_user.team_ids
+            all_tasks = Task.left_outer_joins(:task_shares)
+                            .where(user_id: current_user.id)
+                            .or(Task.where(task_shares: { team_id: my_team_ids }))
+                            .distinct
 
-            # 2. 【重要】描画が終わるまで params を汚さないようにローカル変数を使う
+            #  target_date は params[:start_date] を優先。1月なら "2026-01-01" が入る。
+            target_date = params[:start_date].presence || Date.today.to_s
+
+            # 2. 描画が終わるまで params を汚さないようにローカル変数を使う
             render turbo_stream: [
               # ブラウザのURL状態を即座に更新（シンプルカレンダーのリンク生成に影響が出る前に反映）
               turbo_stream.action(:replace_state, tasks_path(start_date: target_date)),
