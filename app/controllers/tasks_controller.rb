@@ -112,69 +112,82 @@ end
   @date = params[:date]
  end
 
- def update
-  if @task.update(task_params)
-    @user_todo_list = current_user.tasks.todo.not_done
-    respond_to do |format|
-      format.turbo_stream {
-        current_date = params[:start_date].presence ? params[:start_date].to_date : Date.today
-        # start_at があればそれを、なければ deadline を、どちらもなければ今日の日付を代用する
-        display_date = @task.start_at&.to_date || @task.deadline&.to_date || Date.today
-        
-        if params[:return_to] == 'day'
-          # --- Dayページ（タイムライン）の処理 ---
-          # --- 1. 日付の決定：表示中の日(params[:date])を最優先し、タスクの開始日は無視する ---
-          @date = params[:date].presence ? Date.parse(params[:date]) : Date.today
-          day_start = @date.beginning_of_day
-          day_end   = @date.end_of_day
-          # --- 2. 表示権限のあるタスクを再取得（dayアクションと同じロジック） ---
-          my_team_ids = current_user.team_ids
-          visible_tasks = Task.left_outer_joins(:task_shares)
-                      .where(user_id: current_user.id)
-                      .or(Task.where(task_shares: { team_id: my_team_ids }))
-                      .distinct
-          # --- 3. その日に該当するタスクを抽出（dayアクションと完全に一致させる） ---
-          @day_tasks = visible_tasks.where(
-           "(start_at <= ? AND end_at >= ?) OR (deadline >= ? AND deadline <= ?)",
-            day_end, day_start,
-            day_start, day_end
+def update
+    if @task.update(task_params)
+      @user_todo_list = current_user.tasks.todo.not_done
+      respond_to do |format|
+        format.turbo_stream {
+          # 表示すべき基準日を確定させておく
+          target_date = params[:start_date].presence || Date.today.to_s
+          
+          if params[:return_to] == 'day'
+            # --- Dayページ（タイムライン）の処理 ---
+            @date = params[:date].presence ? Date.parse(params[:date]) : Date.today
+            day_start = @date.beginning_of_day
+            day_end   = @date.end_of_day
+            
+            my_team_ids = current_user.team_ids
+            visible_tasks = Task.left_outer_joins(:task_shares)
+                                .where(user_id: current_user.id)
+                                .or(Task.where(task_shares: { team_id: my_team_ids }))
+                                .distinct
+
+            @day_tasks = visible_tasks.where(
+              "(start_at <= ? AND end_at >= ?) OR (deadline >= ? AND deadline <= ?)",
+               day_end, day_start, day_start, day_end
             ).order(:start_at, :deadline).distinct
 
-          render turbo_stream: [
-          # タイムライン部分のみをピンポイントで更新
-         turbo_stream.replace("day_events_container",
-                         partial: 'tasks/day_events',
-                         locals: { day_tasks: @day_tasks, date: @date }),
-    
-          # サイドバーのTODOリストも最新の状態に更新
-          turbo_stream.update("sidebar_todo_list", 
-                        partial: "tasks/sidebar_todo_list", 
-                        locals: { todo_list: visible_tasks.todo.where(status: [:todo, :doing]).order(priority: :desc, deadline: :asc) }),
-         # JSでモーダルを閉じる
-         turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
-         ]
-        else
-        render turbo_stream:[ # 1. カレンダー全体を最新にする（これでマルチデイの色の矛盾やNameErrorを防ぐ）
-         turbo_stream.replace("calendar_container",
-                               partial: 'tasks/calendar', 
-                               locals: { tasks: current_user.tasks,start_date: current_date }),
-          
-          # 2. サイドバーの未完了リスト（id="sidebar_todo_list"）だけをピンポイントで即座に書き換える
-         turbo_stream.update("sidebar_todo_list", 
-                              partial: "tasks/sidebar_todo_list", 
-                              locals: { todo_list: @user_todo_list }),
-          # 3. モーダルを閉じる
-         turbo_stream.append_all("body", "<script>document.querySelector('button[data-action*=\"modal#close\"]')?.click()</script>")
-        ]
+            render turbo_stream: [
+              turbo_stream.replace("day_events_container",
+                                   partial: 'tasks/day_events',
+                                   locals: { day_tasks: @day_tasks, date: @date }),
+              turbo_stream.update("sidebar_todo_list", 
+                                   partial: "tasks/sidebar_todo_list", 
+                                   locals: { todo_list: visible_tasks.todo.not_done.order(priority: :desc, deadline: :asc) }),
+              turbo_stream.append_all("body", "<script>
+                document.querySelector('button[data-action*=\"modal#close\"]')?.click();
+                window.history.replaceState({}, '', '#{day_tasks_path(date: @date)}');
+              </script>")
+            ]
+          else
+            # --- カレンダー（Index）の処理 ---
+            # 1. 描画用のタスクを取得（Indexと同じ条件にする）
+            all_tasks = current_user.tasks # 必要に応じて共有タスクも含める
+
+            # 2. 【重要】描画が終わるまで params を汚さないようにローカル変数を使う
+            render turbo_stream: [
+              # ブラウザのURL状態を即座に更新（シンプルカレンダーのリンク生成に影響が出る前に反映）
+              turbo_stream.action(:replace_state, tasks_path(start_date: target_date)),
+              
+              # カレンダー本体の置換（id="calendar_container" を狙う）
+              turbo_stream.replace("calendar_container",
+                                   partial: 'tasks/calendar', 
+                                   locals: { tasks: all_tasks, start_date: target_date }),
+              
+              # サイドバー更新
+              turbo_stream.update("sidebar_todo_list", 
+                                   partial: "tasks/sidebar_todo_list", 
+                                   locals: { todo_list: @user_todo_list }),
+              
+              # JSの後処理：モーダルを閉じ、カレンダーヘッダー等のJSを再実行させる
+              turbo_stream.append_all("body", "<script>
+                document.querySelector('button[data-action*=\"modal#close\"]')?.click();
+                window.history.replaceState({}, '', '#{tasks_path(start_date: target_date)}');
+                
+                // もし年月表示を更新するJS関数（例: updateCalendarHeader）があればここで呼ぶ
+                if (typeof updateCalendarHeader === 'function') { updateCalendarHeader(); }
+                // あるいは turbo:load イベントを模倣してJSを再発火させる
+                document.dispatchEvent(new Event('turbo:load'));
+              </script>")
+            ]
+          end
+        }
+        format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
       end
-      }
-      # 念のため、普通のフォーム送信の場合
-      format.html { redirect_to tasks_path(start_date: params[:start_date]), notice: "予定を更新しました" }
+    else
+      render :edit, status: :unprocessable_entity
     end
-   else
-    render :edit, status: :unprocessable_entity
-   end
- end
+  end
 
  def destroy
   @task.destroy

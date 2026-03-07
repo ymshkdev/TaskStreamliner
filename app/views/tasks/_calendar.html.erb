@@ -1,5 +1,5 @@
 <div id="calendar_container" class="calendar-container" style="flex: 1; min-width: 0;">
-  <%= month_calendar(events: tasks, attribute: :start_time, start_date: start_date) do |date, tasks_on_day| %>
+  <%= month_calendar(events: tasks, attribute: :start_time, start_date: start_date, url: tasks_path) do |date, tasks_on_day| %>
   <div class="day-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
      <%# 左側：日付と祝日名 %>
      <div>
