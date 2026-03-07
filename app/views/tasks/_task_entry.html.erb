@@ -26,7 +26,7 @@
   <% end %>
 
   <%# タイトル部分 %>
-  <%= link_to task_path(task), data: { turbo_frame: "modal_task_detail", action: "click->modal#open" }, class: "task-link" do %>
+  <%= link_to task_path(task, start_date: start_date), data: { turbo_frame: "modal_task_detail", action: "click->modal#open" }, class: "task-link" do %>
     <% if task.todo? && task.priority_high? %>
       <span title="優先度：高">🚩</span>
     <% end %>

@@ -15,6 +15,7 @@
         </span>
         <%# 優先度バッジ %>
         <%= form_with(model: @task, class: "quick-edit-form") do |f| %>
+          <%= hidden_field_tag :start_date, params[:start_date] %>
             <%= f.select :priority, Task.priorities.keys.map { |k| [I18n.t("enums.task.priority.#{k}"), k] }, {}, 
                 { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
           <% end %>
@@ -32,6 +33,7 @@
         <div class="info-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
             <strong>ステータス:</strong>
             <%= form_with(model: @task, class: "quick-status-form") do |f| %>
+              <%= hidden_field_tag :start_date, params[:start_date] %>
               <%= f.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k] }, {}, 
                   { onchange: "this.form.requestSubmit();", class: "status-select-small" } %>
             <% end %>
@@ -80,7 +82,10 @@
 <%= render "comments/form", task: @task, comment: Comment.new %>
 
     <div class="task-actions">
-      <%= link_to "編集する", edit_task_path(@task, return_to: @return_to, date: @date, start_date: @start_date),data: { turbo_frame: "modal_task_detail" }, class:"btn-edit" %>
+      <%= link_to "編集する", 
+    edit_task_path(@task, return_to: @return_to, date: @date, start_date: params[:start_date]), 
+    data: { turbo_frame: "modal_task_detail" }, 
+    class:"btn-edit" %>
       <%= link_to "削除する", task_path(@task), 
                   data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？",turbo_frame: "_top" }, 
                   class: "btn-delete" %>
