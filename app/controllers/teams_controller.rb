@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_my_team, only: [:show, :destroy]
 
   def index
     @teams = current_user.teams
@@ -26,14 +27,12 @@ class TeamsController < ApplicationController
   end
 
   def show
-    @team = Team.find(params[:id])
     @members = @team.users.order('memberships.role DESC')
     # ユーザーと一緒に、そのチームでの membership もまとめて取得(N+1対策)
     @memberships = @team.memberships.includes(:user).order(role: :desc)
   end
 
   def destroy
-   @team = Team.find(params[:id])  
    # リーダーだけがチームを削除（解散）できる
    if current_user.leader_of?(@team)
     @team.destroy
@@ -44,6 +43,13 @@ class TeamsController < ApplicationController
   end
 
   private
+
+  def set_my_team
+    # 自分の所属しているチームの中からしか探さない（他人のチームなら 404 になる）
+    @team = current_user.teams.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to teams_path, alert: "指定されたチームが見つからないか、アクセス権限がありません。"
+  end
 
   def team_params
     params.require(:team).permit(:name)
