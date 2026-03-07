@@ -164,7 +164,7 @@ def update
 
             #  target_date は params[:start_date] を優先。1月なら "2026-01-01" が入る。
             target_date = params[:start_date].presence || Date.today.to_s
-
+            freshest_todo_list = all_tasks.todo.not_done.order(priority: :desc, deadline: :asc)
             # 2. 描画が終わるまで params を汚さないようにローカル変数を使う
             render turbo_stream: [
               # ブラウザのURL状態を即座に更新（シンプルカレンダーのリンク生成に影響が出る前に反映）
@@ -178,7 +178,7 @@ def update
               # サイドバー更新
               turbo_stream.update("sidebar_todo_list", 
                                    partial: "tasks/sidebar_todo_list", 
-                                   locals: { todo_list: @user_todo_list }),
+                                   locals: { todo_list: freshest_todo_list }),
               
               # JSの後処理：モーダルを閉じ、カレンダーヘッダー等のJSを再実行させる
               turbo_stream.append_all("body", "<script>

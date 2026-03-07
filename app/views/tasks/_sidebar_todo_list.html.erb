@@ -1,6 +1,7 @@
 <%# 3. 未完了タスクセクション抜き出し %>
 
 <ul id="sidebar_todo_list" style="list-style: none; padding: 0;">
+ <% if todo_list.any? %>
       <% todo_list.each do |todo| %>
         <li class="sidebar-task-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
           <strong>
@@ -9,4 +10,8 @@
           <div style="font-size: 0.7rem; color: #888;">〆 <%= todo.deadline.strftime("%m/%d %H:%M") %></div>
         </li>
       <% end %>
+      <% else %>
+    <%# リストが空になった時のメッセージ。これがないと ID 自体が画面から消えて次回の更新ができなくなります %>
+    <li style="font-size: 0.8rem; color: #999; padding: 10px 0;">未完了のタスクはありません</li>
+  <% end %>
     </ul>
