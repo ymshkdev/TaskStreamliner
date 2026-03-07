@@ -606,3 +606,15 @@ button.cancel-link:hover {
 .modal-overlay.is-open {
   display: flex !important; /* blockよりflexの方が中央寄せしやすい */
 }
+
+@media (max-width: 768px) {
+  /* 画面幅が768px以下のときだけ適用されるルール */
+  .calendar-container {
+    flex-direction: column; /* 横並びを縦並びに変える */
+    padding: 10px;
+  }
+
+  .sidebar {
+    width: 100%; /* サイドバーを横幅いっぱいに */
+  }
+}
